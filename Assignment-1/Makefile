@@ -14,6 +14,7 @@ else ifeq ($(BLAS),openblas)
 else
     $(error Unknown BLAS=$(BLAS) (use BLAS=atlas or BLAS=openblas))
 endif
+
 SOURCES = datatools.c main.c matmul.c
 OBJECTS = $(SOURCES:.c=.o)
 
