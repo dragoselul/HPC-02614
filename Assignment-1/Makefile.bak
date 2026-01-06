@@ -15,8 +15,4 @@ main: $(OBJECTS)
 	$(CC) $(CFLAGS) -o $@ $(OBJECTS) $(LIBS)
 
 clean:
-	rm -f $(OBJECTS)
-
-clean-all:
 	rm -f main $(OBJECTS)
-# DO NOT DELETE
