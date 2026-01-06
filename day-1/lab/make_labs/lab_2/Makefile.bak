@@ -1,0 +1,12 @@
+CC = gcc
+CFLAGS = -g -O3
+OBJECTS = data.o main.o io.o
+
+exerc2: $(OBJECTS)
+	$(CC) $(OBJECTS) -o exerc2
+data.o: data.c data.h
+main.o: main.c data.h io.h
+io.o: io.h
+
+clean:
+	rm -f $(OBJECTS)

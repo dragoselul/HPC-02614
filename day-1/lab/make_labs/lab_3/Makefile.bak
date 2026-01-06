@@ -1,0 +1,8 @@
+CC = gcc
+CFLAGS = -g -O3
+OBJECTS = data.o main.o io.o
+
+exerc2: $(OBJECTS)
+	$(CC) $(OBJECTS) -o exerc2
+clean:
+	rm -f $(OBJECTS)# DO NOT DELETE
