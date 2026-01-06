@@ -5,7 +5,15 @@ ISA	=
 DEFS	= -DDATA_ANALYSIS
 LIBS	= -lm
 CFLAGS  = $(OPT) $(CHIP) $(ISA) $(DEFS) $(XOPT)
-BLASFLAGS = -L/usr/lib64/atlas -lsatlas
+BLAS ?= openblas
+
+ifeq ($(BLAS),atlas)
+    BLASFLAGS = -L/usr/lib64/atlas -lsatlas
+else ifeq ($(BLAS),openblas)
+    BLASFLAGS = -lopenblas
+else
+    $(error Unknown BLAS=$(BLAS) (use BLAS=atlas or BLAS=openblas))
+endif
 SOURCES = datatools.c main.c matmul.c
 OBJECTS = $(SOURCES:.c=.o)
 
