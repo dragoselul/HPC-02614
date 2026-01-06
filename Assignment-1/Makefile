@@ -1,6 +1,6 @@
 CC	= gcc
-OPT	= -g -O3
-CHIP	=
+OPT	= -g -O3 -std=c99
+CHIP	= -march=native -mtune=native
 ISA	=
 DEFS	= -DDATA_ANALYSIS
 LIBS	= -lm
@@ -12,7 +12,7 @@ OBJECTS = $(SOURCES:.c=.o)
 all: main
 
 main: $(OBJECTS)
-	$(CC) $(CFLAGS) -o $@ $(OBJECTS) $(LIBS)
+	$(CC) $(CFLAGS) -o $@ $(OBJECTS) $(BLASFLAGS) $(LIBS)
 
 clean:
 	rm -f $(OBJECTS)

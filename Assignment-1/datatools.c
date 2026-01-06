@@ -5,7 +5,6 @@
  */
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdbool.h>
 #include <float.h>
 #include <math.h>
 #include "datatools.h"

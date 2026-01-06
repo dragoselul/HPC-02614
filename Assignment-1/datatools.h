@@ -6,6 +6,8 @@
 #ifndef __DATATOOLS_H
 #define __DATATOOLS_H
 
+#include <stdbool.h>
+
 void display_matrix(int m, int n, double** M);
 
 void init_data_for_one(int m, int n, double** M, double value, bool gen_random);
