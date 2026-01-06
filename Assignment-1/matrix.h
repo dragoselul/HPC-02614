@@ -1,6 +1,3 @@
-//
-// Created by dragoselul on 1/6/26.
-//
 #include <stdlib.h>
 
 double **dmalloc_2d(int m, int n) {
