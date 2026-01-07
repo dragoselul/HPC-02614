@@ -1,31 +1,48 @@
-CC	= gcc
-OPT	= -g -O3 -std=c99
-CHIP	= -march=native -mtune=native
-ISA	=
-DEFS	= -DDATA_ANALYSIS
-LIBS	= -lm
-CFLAGS  = $(OPT) $(CHIP) $(ISA) $(DEFS) $(XOPT)
-BLAS ?= openblas
+CC   = gcc
+OPT  = -g -O3 -std=c99
+CHIP = -march=native -mtune=native
+ISA  =
+DEFS = -DDATA_ANALYSIS
 
+PIC    = -fPIC
+CFLAGS = $(OPT) $(PIC) $(CHIP) $(ISA) $(DEFS) $(XOPTS)
+
+LIBS = -lm
+
+# Pick BLAS implementation: make BLAS=atlas  OR  make BLAS=openblas
+BLAS ?= openblas
 ifeq ($(BLAS),atlas)
-    BLASFLAGS = -L/usr/lib64/atlas -lsatlas
+	BLASFLAGS = -L/usr/lib64/atlas -lsatlas
 else ifeq ($(BLAS),openblas)
-    BLASFLAGS = -lopenblas
+	BLASFLAGS = -lopenblas
 else
-    $(error Unknown BLAS=$(BLAS) (use BLAS=atlas or BLAS=openblas))
+	$(error Unknown BLAS=$(BLAS) (use BLAS=atlas or BLAS=openblas))
 endif
 
-SOURCES = datatools.c main.c matmul.c
-OBJECTS = $(SOURCES:.c=.o)
+TARGET  = libmatmult.so
+SOFLAGS = -shared
 
-all: main
+# IMPORTANT: library sources must NOT include main.c
+LIBSRCS = matmul.c datatools.c
+LIBOBJS = $(LIBSRCS:.c=.o)
 
-main: $(OBJECTS)
-	$(CC) $(CFLAGS) -o $@ $(OBJECTS) $(BLASFLAGS) $(LIBS)
+# Optional local test executable (kept separate)
+MAINSRCS = main.c
+MAINOBJS = $(MAINSRCS:.c=.o)
+
+all: $(TARGET)
+
+$(TARGET): $(LIBOBJS)
+	$(CC) -o $@ $(SOFLAGS) $(LIBOBJS) $(BLASFLAGS) $(LIBS)
+
+main: $(LIBOBJS) $(MAINOBJS)
+	$(CC) -o $@ $(LIBOBJS) $(MAINOBJS) $(BLASFLAGS) $(LIBS)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJECTS)
+	rm -f $(LIBOBJS) $(MAINOBJS)
 
-clean-all:
-	rm -f main $(OBJECTS)
-# DO NOT DELETE
+clean-all: clean
+	rm -f $(TARGET) main
