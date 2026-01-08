@@ -14,7 +14,7 @@
 #BSUB -W 15
 # uncomment the following line, if you want to assure that your job has
 # a whole CPU for itself (shared L3 cache)
- #BSUB -R "span[hosts=1] affinity[socket(1)]"
+#BSUB -R "span[hosts=1] affinity[socket(1)]"
 # define the driver name to use
 # valid values: matmult_c.studio, matmult_f.studio, matmult_c.gcc or
 # matmult_f.gcc
