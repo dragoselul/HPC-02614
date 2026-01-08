@@ -98,7 +98,7 @@ void matmult_blk(int m, int n, int k, double** A, double** B, double** C, int bs
         //set C to 0
         for (int i2 = i1; i2 < i1 + bs && i2 < m; i2++)
         {
-            for (int j = 1; j < n; j++)
+            for (int j = 0; j < n; j++)
             {
                 C[i2][j] = 0;
             }
