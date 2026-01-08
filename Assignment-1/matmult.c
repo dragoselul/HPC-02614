@@ -1,6 +1,5 @@
 #include "matmult.h"
 #include <cblas.h>
-#define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
 void matmult_nat(int m, int n, int k, double** A, double** B, double** C) {
     for (int i = 0; i < m; i++) {
@@ -97,9 +96,12 @@ void matmult_blk(int m, int n, int k, double** A, double** B, double** C, int bs
     for (int i1 = 0; i1 < m; i1 += bs)
     {
         //set C to 0
-        for (int j = 1; j < n; j++)
+        for (int i2 = i1; i2 < i1 + bs && i2 < m; i2++)
         {
-            C[i1][j] = 0;
+            for (int j = 1; j < n; j++)
+            {
+                C[i2][j] = 0;
+            }
         }
         for (int s1 = 0; s1 < k; s1 += bs)
         {
