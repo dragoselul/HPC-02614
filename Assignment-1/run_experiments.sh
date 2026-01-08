@@ -17,6 +17,8 @@ BLKSIZES="8 16 32 64 128 256"
 # Clean old data files
 rm -f *.dat
 
+export MATMULT_COMPARE=1
+
 # Run permutation experiments
 for PERM in $PERMS; do
     echo "Running $PERM..."

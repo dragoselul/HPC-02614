@@ -31,11 +31,11 @@ MKN="100 100 100"
 
 # define the permutation type in PERM
 #
-PERM="nat lib mnk mkn kmn knm nmk nkm"
+PERM="per"
 
 # uncomment and set a reasonable BLKSIZE for the blk version
 #
-BLKSIZE=100
+BLKSIZE=128
 
 # define the max no. of iterations the driver should use - adjust to
 # get a reasonable run time.  You can get an estimate by trying this
@@ -43,7 +43,7 @@ BLKSIZE=100
 # problem size you want to analyze.
 #
 export MFLOPS_MAX_IT=1000
-export MATMULT_COMPARE=0
+export MATMULT_COMPARE=1
 
 # experiment name 
 #

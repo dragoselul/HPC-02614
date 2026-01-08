@@ -14,8 +14,7 @@
 #BSUB -W 15
 # uncomment the following line, if you want to assure that your job has
 # a whole CPU for itself (shared L3 cache)
-# #BSUB -R "span[hosts=1] affinity[socket(1)]"
-
+ #BSUB -R "span[hosts=1] affinity[socket(1)]"
 # define the driver name to use
 # valid values: matmult_c.studio, matmult_f.studio, matmult_c.gcc or
 # matmult_f.gcc
@@ -35,7 +34,7 @@ PERM="nat lib mnk mkn kmn knm nmk nkm"
 BLKSIZES="8 16 32 64 128 256"
 
 # enable(1)/disable(0) result checking
-export MATMULT_COMPARE=0
+export MATMULT_COMPARE=1
 #export MATMULT_RESULTS=1
 # start the collect command with the above settings
 for S in $SIZES
