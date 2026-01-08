@@ -14,7 +14,7 @@
 #BSUB -W 15
 # uncomment the following line, if you want to assure that your job has
 # a whole CPU for itself (shared L3 cache)
-# #BSUB -R "span[hosts=1] affinity[socket(1)]"
+#BSUB -R "span[hosts=1] affinity[socket(1)]"
 
 # needed for the collect tool
 module load gprofng
@@ -31,7 +31,7 @@ MKN="100 100 100"
 
 # define the permutation type in PERM
 #
-PERM="per"
+PERM="nat lib mnk mkn kmn knm nmk nkm"
 
 # uncomment and set a reasonable BLKSIZE for the blk version
 #

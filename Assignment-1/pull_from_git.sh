@@ -26,13 +26,4 @@ cd "$REPO_DIR"
 echo "Pulling latest changes..."
 git pull origin main  # or whatever your branch is
 
-# Build
-echo "Building project..."
-make clean
-make all BLAS=atlas
-
-# Run
-echo "Running program..."
-$PROGRAM
-
 echo "Done!"

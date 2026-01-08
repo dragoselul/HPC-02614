@@ -1,6 +1,13 @@
 #!/bin/bash
 # Script to generate .dat files for different matrix multiplication algorithms
 # Similar to run_tunelab.sh from day-2/lab
+#BSUB -J run_experiments
+#BSUB -o run_experiments_%J.out
+#BSUB -q hpcintro
+#BSUB -n 1
+#BSUB -R "rusage[mem=2048]"
+#BSUB -W 15
+#BSUB -R "span[hosts=1] affinity[socket(1)]"
 
 EXECUTABLE=matmult_c.gcc
 SIZES="50 100 150 200 300 400 500 700 1000 1500 2000"

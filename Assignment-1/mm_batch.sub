@@ -24,15 +24,15 @@ EXECUTABLE=matmult_c.gcc
 
 # define the mkn values in the MKN variable
 #
-SIZES="400 300 800"
+SIZES="50 100 150 200 300 400 500 700 1000 1500 2000"
 
 # define the permutation type in PERM
 #
-PERM="mkn"
+PERM="nat lib mnk mkn kmn knm nmk nkm"
 
 # uncomment and set a reasonable BLKSIZE for the blk version
 #
-# BLKSIZE=1
+BLKSIZES="8 16 32 64 128 256"
 
 # enable(1)/disable(0) result checking
 export MATMULT_COMPARE=0

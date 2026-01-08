@@ -1,4 +1,4 @@
-#include "matmul.h"
+#include "matmult.h"
 #include <cblas.h>
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 

@@ -23,20 +23,13 @@ TARGET  = libmatmult.so
 SOFLAGS = -shared
 
 # IMPORTANT: library sources must NOT include main.c
-LIBSRCS = matmul.c datatools.c
+LIBSRCS = matmult.c datatools.c
 LIBOBJS = $(LIBSRCS:.c=.o)
-
-# Optional local test executable (kept separate)
-MAINSRCS = main.c
-MAINOBJS = $(MAINSRCS:.c=.o)
 
 all: $(TARGET)
 
 $(TARGET): $(LIBOBJS)
 	$(CC) -o $@ $(SOFLAGS) $(LIBOBJS) $(BLASFLAGS) $(LIBS)
-
-main: $(LIBOBJS) $(MAINOBJS)
-	$(CC) -o $@ $(LIBOBJS) $(MAINOBJS) $(BLASFLAGS) $(LIBS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
