@@ -13,7 +13,7 @@ set logscale x
 set grid
 set key right bottom
 
-plot 'nat.dat' using 1:2 with linespoints lw 2 pt 7 title 'nat (ijk)', \
+plot 'nat.dat' using 1:2 with linespoints lw 2 pt 7 title 'nat', \
      'mnk.dat' using 1:2 with linespoints lw 2 pt 5 title 'mnk', \
      'mkn.dat' using 1:2 with linespoints lw 2 pt 9 title 'mkn', \
      'kmn.dat' using 1:2 with linespoints lw 2 pt 11 title 'kmn', \
@@ -22,12 +22,12 @@ plot 'nat.dat' using 1:2 with linespoints lw 2 pt 7 title 'nat (ijk)', \
      'nkm.dat' using 1:2 with linespoints lw 2 pt 8 title 'nkm'
 
 # ============ Plot 2: Best vs BLAS library ============
-set output 'native_vs_blas.png'
-set title "Native Implementation vs BLAS Library"
+set output 'naive_vs_blas.png'
+set title "Naive Implementation vs BLAS Library"
 set xlabel "Matrix Size (N for NxN)"
 set ylabel "MFLOPS"
 
-plot 'mkn.dat' using 1:2 with linespoints lw 2 pt 7 title 'mkn (best native)', \
+plot 'mkn.dat' using 1:2 with linespoints lw 2 pt 7 title 'mkn (best naive)', \
      'lib.dat' using 1:2 with linespoints lw 2 pt 5 title 'BLAS (lib)'
 
 # ============ Plot 3: Block size comparison ============
@@ -59,7 +59,7 @@ plot 'nat.dat' using 1:2 with linespoints lw 2 pt 7 ps 0.7 title 'nat', \
      'knm.dat' using 1:2 with linespoints lw 2 pt 11 ps 0.7 title 'knm'
 
 # Top right: lib comparison
-set title "Native vs BLAS"
+set title "Naive vs BLAS"
 set key left top
 plot 'mkn.dat' using 1:2 with linespoints lw 2 pt 7 title 'mkn', \
      'lib.dat' using 1:2 with linespoints lw 2 pt 5 title 'BLAS'
@@ -69,12 +69,14 @@ set title "Block Size Effect"
 set key right bottom
 plot 'blk_16.dat' using 1:2 with linespoints lw 2 pt 7 title 'bs=16', \
      'blk_32.dat' using 1:2 with linespoints lw 2 pt 5 title 'bs=32', \
-     'blk_64.dat' using 1:2 with linespoints lw 2 pt 9 title 'bs=64'
+     'blk_64.dat' using 1:2 with linespoints lw 2 pt 9 title 'bs=64', \
+     'blk_128.dat' using 1:2 with linespoints lw 2 pt 13 title 'bs=128', \
+     'blk_256.dat' using 1:2 with linespoints lw 2 pt 6 title 'bs=256'
 
 # Bottom right: best blocked vs lib
 set title "Best Blocked vs BLAS"
 set key left top
-plot 'blk_64.dat' using 1:2 with linespoints lw 2 pt 7 title 'blk (bs=64)', \
+plot 'blk_64.dat' using 1:2 with linespoints lw 2 pt 7 title 'blk (bs=128)', \
      'lib.dat' using 1:2 with linespoints lw 2 pt 5 title 'BLAS'
 
 unset multiplot
