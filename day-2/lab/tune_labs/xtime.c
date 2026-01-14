@@ -1,4 +1,4 @@
-/* xtime.c - timer routines */
+/* xtime.cpp - timer routines */
 
 #include <stdlib.h>
 #include <stdio.h>

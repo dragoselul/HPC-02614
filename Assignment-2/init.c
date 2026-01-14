@@ -19,17 +19,17 @@ void print_tesor(double*** A, int N)
 }
 void initialize(double ***u, double ***f, int N, double start_T)
 {
-    double h = 2.0 / (N-1);
+    double delta = 2.0 / (N - 1);
 
-    for (int i = 0; i < N; i++) 
+    for (int i = 0; i < N; i++)
     {
-        double x = -1.0 + i * h;
+        double x = -1.0 + i * delta;
 
         for (int j = 0; j < N; j++) {
-            double y = -1.0 + j * h;
+            double y = -1.0 + j * delta;
 
             for (int k = 0; k < N; k++) {
-                double z = -1.0 + k * h;
+                double z = -1.0 + k * delta;
 
                 // Default initial interior value
                 u[i][j][k] = start_T;
@@ -82,13 +82,13 @@ void initialize(double ***u, double ***f, int N, double start_T)
 
     /*
     for (int i = 0; i < N; i++) {
-        double x = -1.0 + i * h;
+        double x = -1.0 + i * delta;
 
         for (int j = 0; j < N; j++) {
-            double y = -1.0 + j * h;
+            double y = -1.0 + j * delta;
 
             for (int k = 0; k < N; k++) {
-                double z = -1.0 + k * h;
+                double z = -1.0 + k * delta;
 
                 // Default initial interior value
                 u[i][j][k] = start_T;

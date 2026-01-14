@@ -5,8 +5,12 @@
 
 #ifndef _JACOBI_H
 #define _JACOBI_H
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+#include <math.h>
 
 int jacobi(double ***u, double ***u_new, double ***f, int N, int iter_max, double *tolerance);
-void initialize(double ***u, double ***f, int N, double start_T);
+int jacobi_omp(double ***u, double ***u_new, double ***f, int N, int iter_max, double *tolerance);
 
 #endif

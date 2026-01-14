@@ -6,6 +6,7 @@
 #include "alloc3d.h"
 #include "print.h"
 #include "init.h"
+#include "timing.h"
 
 #ifdef _JACOBI
 #include "jacobi.h"
@@ -30,9 +31,14 @@ main(int argc, char *argv[]) {
     char	output_filename[FILENAME_MAX];
     double 	***u = NULL;
 
+    /* check that we have enough arguments */
+    if (argc < 5) {
+        fprintf(stderr, "Usage: %s N iter_max tolerance start_T [output_type]\n", argv[0]);
+        return -1;
+    }
 
     /* get the paramters from the command line */
-    N         = atoi(argv[1]);	// grid size
+    N         = atoi(argv[1]) + 2;	// grid size
     iter_max  = atoi(argv[2]);  // max. no. of iterations
     tolerance = atof(argv[3]);  // tolerance
     start_T   = atof(argv[4]);  // start T for all inner grid points
@@ -52,13 +58,28 @@ main(int argc, char *argv[]) {
 
     initialize(u, f, N, start_T);
 
+    perf_data_t perf;
+    int iters = 0;
+
     #ifdef _JACOBI
-        int iters = jacobi(u, u_new, f, N, iter_max, &tolerance);
+        // Benchmark to find optimal thread count (comment out if not needed)
+        int optimal_threads = find_optimal_threads(jacobi_omp, u, u_new, f, N, 100, &tolerance);
+
+        // Benchmark grid sizes to show cache effects (comment out if not needed)
+        benchmark_grid_sizes(jacobi_omp, iter_max, tolerance, start_T, optimal_threads);
+
+        timer_start(&perf);
+        iters = jacobi_omp(u, u_new, f, N, iter_max, &tolerance);
+        timer_stop(&perf, iters, N);
     #endif
 
     #ifdef _GAUSS_SEIDEL
-        gauss_seidel();
+        timer_start(&perf);
+        // iters = gauss_seidel(...);
+        timer_stop(&perf, iters, N);
     #endif
+
+    print_performance(&perf);
     // end of our code
 
     // dump  results if wanted 
@@ -85,6 +106,8 @@ main(int argc, char *argv[]) {
 
     // de-allocate memory
     free_3d(u);
+    free_3d(u_new);
+    free_3d(f);
 
     return(0);
 }

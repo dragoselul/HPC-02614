@@ -3,8 +3,8 @@
 TARGET_J  = poisson_j		# Jacobi
 TARGET_GS = poisson_gs		# Gauss-Seidel
 
-SOURCES	= main.c print.c alloc3d.c init.c
-OBJECTS	= print.o alloc3d.o init.o
+SOURCES	= main.c print.c alloc3d.c init.c timing.c
+OBJECTS	= print.o alloc3d.o init.o timing.o
 MAIN_J	= main_j.o
 MAIN_GS = main_gs.o
 OBJS_J	= $(MAIN_J) jacobi.o
@@ -17,9 +17,9 @@ DEFS	=
 OPT	= -g 
 IPO	= 
 ISA	= 
-CHIP	= 
+CHIP	= -march=native -mtune=native
 ARCH	= 
-PARA	= 
+PARA	= -fopenmp -funroll-loops -O3
 CFLAGS	= $(DEFS) $(ARCH) $(OPT) $(ISA) $(CHIP) $(IPO) $(PARA) $(XOPTS)
 LDFLAGS = -lm 
 
