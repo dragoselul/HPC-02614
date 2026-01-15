@@ -131,9 +131,17 @@ void benchmark_grid_sizes(solver_func_t solver, int iter_max, double tolerance,
         return;
     }
 
+    FILE *fp2 = fopen("experiments/updates_per_second.dat", "w");
+    if (!fp2) {
+        fprintf(stderr, "Warning: Cannot open updates_per_second.dat\n");
+        fp2 = NULL;
+    }
+
     fprintf(fp, "# N Memory_MB GFLOPS Time_s\n");
+    fprintf(fp2, "# N UpdatesPerSecond Time_s\n");
+
     printf("Grid Scaling (threads=%d)\n", num_threads);
-    printf("   N | Memory(MB) | GFLOPS | Time(s)\n");
+    printf("   N | Memory(MB) | GFLOPS | Time(s)\n | Updates/s\n");
 
     for (int i = 0; i < num_sizes; i++) {
         int N = grid_sizes[i] + 2;
@@ -163,10 +171,15 @@ void benchmark_grid_sizes(solver_func_t solver, int iter_max, double tolerance,
         solver(u, u_new, f, N, iter_max, &tol);
         timer_stop(&perf, iter_max, N);
 
-        printf("%4d | %10.2f | %6.3f | %7.4f\n",
-               grid_sizes[i], memory_mb, perf.gflops, perf.elapsed);
+        long long interior = (long long)(N - 2) * (N - 2) * (N - 2);
+        double updates_per_sec = (interior * (double)iter_max) / perf.elapsed;
+
+        printf("%4d | %10.2f | %6.3f | %7.4f | %.3e\n",
+               grid_sizes[i], memory_mb, perf.gflops, perf.elapsed, updates_per_sec);
         fprintf(fp, "%d %.2f %.3f %.6f\n",
                 grid_sizes[i], memory_mb, perf.gflops, perf.elapsed);
+        fprintf(fp2, "%d %.6e %.6f\n",
+                    grid_sizes[i], updates_per_sec, perf.elapsed);
 
         free_3d(u);
         free_3d(u_new);
@@ -174,6 +187,7 @@ void benchmark_grid_sizes(solver_func_t solver, int iter_max, double tolerance,
     }
 
     fclose(fp);
+    fclose(fp2);
 
     /* Write cache boundaries file for plotting */
     FILE *cache_fp = fopen("experiments/cache_boundaries.dat", "w");

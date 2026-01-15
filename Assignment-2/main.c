@@ -93,9 +93,6 @@ main(int argc, char *argv[]) {
         timer_start(&perf);
         iters = jacobi(u, u_new, f, N, iter_max, &tolerance);
         timer_stop(&perf, iters, N);
-
-        double updates_per_second = (double)(N-2)*(N-2)*(N-2)*iters / perf.elapsed;
-        printf("Updates per second: %.2f\n", updates_per_second);
     #endif
 
     #ifdef _GAUSS_SEIDEL
@@ -108,9 +105,6 @@ main(int argc, char *argv[]) {
         timer_start(&perf);
         iters = gauss_seidel(u, f, N, iter_max, &tolerance);
         timer_stop(&perf, iters, N);
-
-        double updates_per_second = (double)(N-2)*(N-2)*(N-2)*iters / perf.elapsed;
-        printf("Updates per second: %.2f\n", updates_per_second);
     #endif
 
     print_performance(&perf);
