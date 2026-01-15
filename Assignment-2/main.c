@@ -16,10 +16,29 @@
 #include "gauss_seidel.h"
 #endif
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 #define N_DEFAULT 100
 
 int
 main(int argc, char *argv[]) {
+
+#ifdef _OPENMP
+    // Print OpenMP configuration
+    printf("=== OpenMP Configuration ===\n");
+    printf("Max threads available: %d\n", omp_get_max_threads());
+    printf("Number of processors: %d\n", omp_get_num_procs());
+    printf("Dynamic adjustment: %s\n", omp_get_dynamic() ? "enabled" : "disabled");
+    printf("Nested parallelism: %s\n", omp_get_nested() ? "enabled" : "disabled");
+    #pragma omp parallel
+    {
+        #pragma omp master
+        printf("Threads in use: %d\n", omp_get_num_threads());
+    }
+    printf("============================\n\n");
+#endif
 
     int 	N = N_DEFAULT;
     int 	iter_max = 1000;
@@ -53,7 +72,7 @@ main(int argc, char *argv[]) {
     }
 
     // Set cache sizes for AMD Ryzen 7 7745HX (L1=32KB, L2=1MB, L3=32MB)
-    set_cache_sizes(32, 1024, 32768);
+    set_cache_sizes(768, 6144, 61440);
 
     // our code
     double ***u_new = malloc_3d(N, N, N);
