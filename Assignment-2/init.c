@@ -76,7 +76,7 @@ void initialize(double ***u, double ***f, int N, double start_T)
         for(int k = 0; k < N; k++)
         {
             u[i][0][k]   = 0;
-            u[i][N-1][k] = 0;
+            u[i][N-1][k] = 20;
         }
     }
 
