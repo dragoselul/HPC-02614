@@ -3,6 +3,7 @@
  */
 #include <math.h>
 #include "gauss_seidel.h"
+#include <stdio.h>
 
 int
 gauss_seidel(double ***u, double ***f, int N, int iter_max, double *tolerance) {
@@ -15,6 +16,7 @@ gauss_seidel(double ***u, double ***f, int N, int iter_max, double *tolerance) {
     while (d > *tolerance && it < iter_max) {
         d = 0.0;
         for (int i = 1; i < N-1; i++)
+        {
             for (int j = 1; j < N-1; j++)
                 for (int k = 1; k < N-1; k++) {
 
@@ -27,9 +29,10 @@ gauss_seidel(double ***u, double ***f, int N, int iter_max, double *tolerance) {
                             h2 * f[i][j][k]
                         );
 
-                    d = fabs(u[i][j][k] - old_val);
+                    double diff = fabs(u[i][j][k] - old_val);
+                    if (diff > d) d = diff;
                 }
-
+        }
         it++;
     }
 
