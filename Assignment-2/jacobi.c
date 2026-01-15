@@ -31,6 +31,7 @@ int jacobi(double ***u, double ***u_new, double ***f, int N, int iter_max, doubl
 
                     u_new[i][j][k] = new_val;
                 }
+        /*
         for(int i = 1; i < N-1; i++)
         {
             for (int j = 1; j < N-1; j++)
@@ -41,7 +42,10 @@ int jacobi(double ***u, double ***u_new, double ***f, int N, int iter_max, doubl
                 }
             }
         }
-
+        */
+        double ***tmp = u;
+        u = u_new;
+        u_new = tmp;
         it++;
 
         //printf("Iteration %d: d = %e\n", it, d);
