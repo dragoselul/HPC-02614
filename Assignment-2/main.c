@@ -59,20 +59,20 @@ main(int argc, char *argv[]) {
     double ***u_new = malloc_3d(N, N, N);
     double ***f     = malloc_3d(N, N, N);
 
-    initialize(u, f, N, start_T);
+    initialize(u, u_new, f, N, start_T);
 
     perf_data_t perf;
     int iters = 0;
 
     #ifdef _JACOBI
         // Benchmark to find optimal thread count (comment out if not needed)
-        int optimal_threads = find_optimal_threads(jacobi_omp, u, u_new, f, N, 100, &tolerance);
+        //int optimal_threads = find_optimal_threads(jacobi_omp, u, u_new, f, N, 100, &tolerance);
 
         // Benchmark grid sizes to show cache effects (comment out if not needed)
-        benchmark_grid_sizes(jacobi_omp, iter_max, tolerance, start_T, optimal_threads);
+        //benchmark_grid_sizes(jacobi_omp, iter_max, tolerance, start_T, optimal_threads);
 
         timer_start(&perf);
-        iters = jacobi_omp(u, u_new, f, N, iter_max, &tolerance);
+        iters = jacobi(u, u_new, f, N, iter_max, &tolerance);
         timer_stop(&perf, iters, N);
     #endif
 

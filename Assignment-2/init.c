@@ -2,23 +2,8 @@
 #include "init.h"
 #include <stdio.h>
 
-void print_tesor(double*** A, int N)
-{
-    for(int i = 0; i < N; i++)
-    {
-        printf("Layer %d\n", i);
-        for(int j = 0; j < N; j++)
-        {
-            for(int k = 0; k < N; k++)
-            {
-                printf("%f ", A[i][j][k]);
-            }
-            printf("\n");
-        }
-    }
-}
-void initialize(double ***u, double ***f, int N, double start_T)
-{
+
+void initialize(double ***u, double ***u_new, double ***f, int N, double start_T){
     double delta = 2.0 / (N - 1);
 
     for (int i = 0; i < N; i++)
@@ -33,6 +18,7 @@ void initialize(double ***u, double ***f, int N, double start_T)
 
                 // Default initial interior value
                 u[i][j][k] = start_T;
+                u_new[i][j][k] = start_T;
                 f[i][j][k] = 0.0;
             }
         }
@@ -64,6 +50,8 @@ void initialize(double ***u, double ***f, int N, double start_T)
         {
             u[0][j][k]   = 20;
             u[N-1][j][k] = 20;
+            u_new[0][j][k]   = 20;
+            u_new[N-1][j][k] = 20;
         }
     }
     for(int i = 0; i < N; i++)
@@ -72,11 +60,15 @@ void initialize(double ***u, double ***f, int N, double start_T)
         {
             u[i][j][0]   = 20;
             u[i][j][N-1] = 20;
+            u_new[i][j][0]   = 20;
+            u_new[i][j][N-1] = 20;
         }
         for(int k = 0; k < N; k++)
         {
             u[i][0][k]   = 0;
             u[i][N-1][k] = 20;
+            u_new[i][0][k]   = 0;
+            u_new[i][N-1][k] = 20;
         }
     }
 
