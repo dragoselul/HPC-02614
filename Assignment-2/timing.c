@@ -151,7 +151,7 @@ void benchmark_grid_sizes(solver_func_t solver, int iter_max, double tolerance,
             continue;
         }
 
-        initialize(u, f, N, start_T);
+        initialize(u, u_new, f, N, start_T);
         for (int x = 0; x < N; x++)
             for (int y = 0; y < N; y++)
                 for (int z = 0; z < N; z++)
