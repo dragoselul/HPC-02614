@@ -29,17 +29,17 @@ int jacobi(double ***u, double ***u_new, double ***f, int N, int iter_max, doubl
                     double diff = fabs(new_val - u[i][j][k]);
                     if (diff > d) d = diff;
 
-
-                    u_new[i][j][k] = new_val;
+                    u[i][j][k] = new_val;
+                    //u_new[i][j][k] = new_val;
                 }
 
-        double ***tmp = u;
-        u = u_new;
-        u_new = tmp;
+        //double ***tmp = u;
+        //u = u_new;
+        //u_new = tmp;
 
         it++;
 
-        printf("Iteration %d: d = %e\n", it, d);
+        //printf("Iteration %d: d = %e\n", it, d);
     }
 
     return it;
