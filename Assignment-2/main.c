@@ -85,20 +85,32 @@ main(int argc, char *argv[]) {
 
     #ifdef _JACOBI
         // Benchmark to find optimal thread count (comment out if not needed)
-        //int optimal_threads = find_optimal_threads(jacobi_omp, u, u_new, f, N, 100, &tolerance);
+        int optimal_threads = find_optimal_threads(jacobi_omp, u, u_new, f, N, 100, &tolerance);
 
         // Benchmark grid sizes to show cache effects (comment out if not needed)
-        //benchmark_grid_sizes(jacobi_omp, iter_max, tolerance, start_T, optimal_threads);
+        benchmark_grid_sizes(jacobi_omp, iter_max, tolerance, start_T, optimal_threads);
 
         timer_start(&perf);
         iters = jacobi(u, u_new, f, N, iter_max, &tolerance);
         timer_stop(&perf, iters, N);
+
+        double updates_per_second = (double)(N-2)*(N-2)*(N-2)*iters / perf.elapsed;
+        printf("Updates per second: %.2f\n", updates_per_second);
     #endif
 
     #ifdef _GAUSS_SEIDEL
+        // Benchmark to find optimal thread count (comment out if not needed)
+        int optimal_threads = find_optimal_threads(gauss_seidel_wrapper, u, u_new, f, N, 100, &tolerance);
+
+        // Benchmark grid sizes to show cache effects (comment out if not needed)
+        benchmark_grid_sizes(gauss_seidel_wrapper, iter_max, tolerance, start_T, optimal_threads);
+
         timer_start(&perf);
-        // iters = gauss_seidel(...);
+        iters = gauss_seidel(u, f, N, iter_max, &tolerance);
         timer_stop(&perf, iters, N);
+
+        double updates_per_second = (double)(N-2)*(N-2)*(N-2)*iters / perf.elapsed;
+        printf("Updates per second: %.2f\n", updates_per_second);
     #endif
 
     print_performance(&perf);

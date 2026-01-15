@@ -31,24 +31,10 @@ int jacobi(double ***u, double ***u_new, double ***f, int N, int iter_max, doubl
 
                     u_new[i][j][k] = new_val;
                 }
-        /*
-        for(int i = 1; i < N-1; i++)
-        {
-            for (int j = 1; j < N-1; j++)
-            {
-                for (int k = 1; k < N-1; k++) 
-                {
-                    u[i][j][k] = u_new[i][j][k];
-                }
-            }
-        }
-        */
         double ***tmp = u;
         u = u_new;
         u_new = tmp;
         it++;
-
-        //printf("Iteration %d: d = %e\n", it, d);
     }
 
     return it;
@@ -61,11 +47,6 @@ int jacobi_omp(double ***u, double ***u_new, double ***f, int N, int iter_max, d
 
     double d = INFINITY;
     int it = 0;
-#ifdef _OPENMP
-    int threads = omp_get_max_threads() < 16? omp_get_max_threads() : 16 ;
-    omp_set_num_threads(threads);
-    omp_set_dynamic(0);
-#endif
 
     while (d > *tolerance && it < iter_max) {
         d = 0.0;
@@ -87,8 +68,6 @@ int jacobi_omp(double ***u, double ***u_new, double ***f, int N, int iter_max, d
                 }
             }
         }
-
-        // Swap pointers
         double ***tmp = u;
         u = u_new;
         u_new = tmp;
