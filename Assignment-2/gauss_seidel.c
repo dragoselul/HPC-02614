@@ -27,7 +27,8 @@ gauss_seidel(double ***u, double ***f, int N, int iter_max, double *tolerance) {
                             h2 * f[i][j][k]
                         );
 
-                    d = fabs(u[i][j][k] - old_val);
+                    double diff = fabs(u[i][j][k] - old_val);
+                    if (diff > d) d = diff;
                 }
 
         it++;
