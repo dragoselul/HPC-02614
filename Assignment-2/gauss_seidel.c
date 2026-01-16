@@ -9,6 +9,10 @@ int gauss_seidel_wrapper(double ***u, double ***u_new, double ***f, int N, int i
     return gauss_seidel_omp(u, f, N, iter_max, tolerance); 
 }
 
+int gauss_seidel_wrapper_seq(double ***u, double ***u_new, double ***f, int N, int iter_max, double *tolerance) {
+    return gauss_seidel(u, f, N, iter_max, tolerance); 
+}
+
 int
 gauss_seidel(double ***u, double ***f, int N, int iter_max, double *tolerance) {
     double h = 2.0 / (N - 1);
