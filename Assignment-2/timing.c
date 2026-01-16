@@ -172,7 +172,7 @@ void benchmark_grid_sizes(solver_func_t solver, int iter_max, double tolerance,
         timer_stop(&perf, iter_max, N);
 
         long long interior = (long long)(N - 2) * (N - 2) * (N - 2);
-        double updates_per_sec = (interior * (double)iter_max) / perf.elapsed;
+        double updates_per_sec = (interior * perf.iterations) / perf.elapsed;
 
         printf("%4d | %10.2f | %6.3f | %7.4f | %.3e\n",
                grid_sizes[i], memory_mb, perf.gflops, perf.elapsed, updates_per_sec);
