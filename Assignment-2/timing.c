@@ -141,7 +141,7 @@ void benchmark_grid_sizes(solver_func_t solver, int iter_max, double tolerance,
     fprintf(fp2, "# N UpdatesPerSecond Time_s\n");
 
     printf("Grid Scaling (threads=%d)\n", num_threads);
-    printf("   N | Memory(MB) | GFLOPS | Time(s)\n | Updates/s\n");
+    printf("   N | Memory(MB) | GFLOPS | Time(s)  | MUpdates/s\n");
 
     for (int i = 0; i < num_sizes; i++) {
         int N = grid_sizes[i] + 2;
@@ -174,11 +174,11 @@ void benchmark_grid_sizes(solver_func_t solver, int iter_max, double tolerance,
         long long interior = (long long)(N - 2) * (N - 2) * (N - 2);
         double updates_per_sec = (interior * perf.iterations) / perf.elapsed;
 
-        printf("%4d | %10.2f | %6.3f | %7.4f | %.3e\n",
-               grid_sizes[i], memory_mb, perf.gflops, perf.elapsed, updates_per_sec);
+        printf("%4d | %10.2f | %6.3f | %7.4f | %10.2f\n",
+               grid_sizes[i], memory_mb, perf.gflops, perf.elapsed, updates_per_sec / 1.0e6);
         fprintf(fp, "%d %.2f %.3f %.6f\n",
                 grid_sizes[i], memory_mb, perf.gflops, perf.elapsed);
-        fprintf(fp2, "%d %.6e %.6f\n",
+        fprintf(fp2, "%d %.0f %.6f\n",
                     grid_sizes[i], updates_per_sec, perf.elapsed);
 
         free_3d(u);

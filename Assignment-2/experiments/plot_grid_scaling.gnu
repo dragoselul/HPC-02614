@@ -36,7 +36,7 @@ set label 1 "L1" at L1_MB, graph 0.95 center tc rgb '#ff0000' font ',10'
 set label 2 "L2" at L2_MB, graph 0.95 center tc rgb '#00aa00' font ',10'
 set label 3 "L3" at L3_MB, graph 0.95 center tc rgb '#0000ff' font ',10'
 
-plot 'grid_scaling.dat' using 3:4 with linespoints pt 7 ps 1.5 lw 2 lc rgb '#0060ad' title 'Actual GFLOPS'
+plot 'grid_scaling.dat' using 2:3 with linespoints pt 7 ps 1.5 lw 2 lc rgb '#0060ad' title 'Actual GFLOPS'
 
 # Clear arrows and labels for next plot
 unset arrow 1
@@ -72,7 +72,7 @@ set label 1 sprintf("L1 (N≈%.0f)", N_L1) at N_L1, graph 0.95 center tc rgb '#f
 set label 2 sprintf("L2 (N≈%.0f)", N_L2) at N_L2, graph 0.95 center tc rgb '#00aa00' font ',10'
 set label 3 sprintf("L3 (N≈%.0f)", N_L3) at N_L3, graph 0.95 center tc rgb '#0000ff' font ',10'
 
-plot 'grid_scaling.dat' using 1:4 with linespoints pt 7 ps 1.5 lw 2 lc rgb '#0060ad' title 'Actual GFLOPS'
+plot 'grid_scaling.dat' using 1:3 with linespoints pt 7 ps 1.5 lw 2 lc rgb '#0060ad' title 'Actual GFLOPS'
 
 unset multiplot
 
@@ -109,8 +109,8 @@ set label 3 "L3 Cache" at N_L3, graph 0.92 center tc rgb '#0000ff' font ',10'
 
 set key top center
 
-plot 'grid_scaling.dat' using 1:4 with linespoints pt 7 ps 1.5 lw 2 lc rgb '#0060ad' title 'GFLOPS' axes x1y1, \
-     'grid_scaling.dat' using 1:3 with linespoints pt 5 ps 1.2 lw 2 lc rgb '#dd181f' title 'Memory (MB)' axes x1y2
+plot 'grid_scaling.dat' using 1:3 with linespoints pt 7 ps 1.5 lw 2 lc rgb '#0060ad' title 'GFLOPS' axes x1y1, \
+     'grid_scaling.dat' using 1:2 with linespoints pt 5 ps 1.2 lw 2 lc rgb '#dd181f' title 'Memory (MB)' axes x1y2
 
 print "Plots generated: grid_scaling.png, cache_effects.png"
 

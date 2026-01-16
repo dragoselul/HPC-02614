@@ -71,7 +71,6 @@ main(int argc, char *argv[]) {
         exit(-1);
     }
 
-    // Set cache sizes for AMD Ryzen 7 7745HX (L1=32KB, L2=1MB, L3=32MB)
     set_cache_sizes(768, 6144, 61440);
 
     // our code
