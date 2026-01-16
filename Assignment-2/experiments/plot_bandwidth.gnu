@@ -54,49 +54,56 @@ set terminal pngcairo size 1000,700 enhanced font 'Arial,12'
 set output 'memory_bandwidth.png'
 
 # Cache sizes (adjust for your CPU)
-L1_KB = 512
-L2_KB = 8192
-L3_MB = 32
+L1_KB = 768
+L2_KB = 6144
+L3_MB = 60
 
-# N values at cache boundaries
-N_L1 = (L1_KB * 1024.0 / 24.0) ** (1.0/3.0) - 2
-N_L2 = (L2_KB * 1024.0 / 24.0) ** (1.0/3.0) - 2
-N_L3 = (L3_MB * 1024.0 * 1024.0 / 24.0) ** (1.0/3.0) - 2
+# Cache sizes in MB for x-axis
+L1_MB = L1_KB / 1024.0
+L2_MB = L2_KB / 1024.0
 
-set title "Memory Bandwidth vs Grid Size (Jacobi 3D Stencil)" font ',14'
-set xlabel "Grid Size (N)"
+# Memory footprint for N: 3 * (N+2)^3 * 8 bytes
+# mem_mb(N) = 3 * (N+2)^3 * 8 / (1024*1024)
+mem_mb(N) = 3.0 * (N+2)**3 * 8.0 / (1024.0 * 1024.0)
+
+set title "Memory Bandwidth vs Memory Footprint (Jacobi 3D Stencil)" font ',14'
+set xlabel "Memory Footprint (MB)"
 set ylabel "Bandwidth (GB/s)"
 set format y "%.1f"
+set logscale x
 set grid
-set key top right
+set key bottom right box
 
-# Cache boundary lines
-set arrow 1 from N_L1, graph 0 to N_L1, graph 1 nohead lc rgb '#ff0000' lw 2 dt 2
-set arrow 2 from N_L2, graph 0 to N_L2, graph 1 nohead lc rgb '#00aa00' lw 2 dt 2
-set arrow 3 from N_L3, graph 0 to N_L3, graph 1 nohead lc rgb '#0000ff' lw 2 dt 2
+# Cache boundary lines (in MB)
+set arrow 1 from L1_MB, graph 0 to L1_MB, graph 1 nohead lc rgb '#ff0000' lw 2 dt 2
+set arrow 2 from L2_MB, graph 0 to L2_MB, graph 1 nohead lc rgb '#00aa00' lw 2 dt 2
+set arrow 3 from L3_MB, graph 0 to L3_MB, graph 1 nohead lc rgb '#0000ff' lw 2 dt 2
 
-set label 1 "L1" at N_L1, graph 0.95 center tc rgb '#ff0000' font ',10'
-set label 2 "L2" at N_L2, graph 0.95 center tc rgb '#00aa00' font ',10'
-set label 3 "L3" at N_L3, graph 0.95 center tc rgb '#0000ff' font ',10'
+set label 1 "L1" at L1_MB, graph 0.95 center tc rgb '#ff0000' font ',10'
+set label 2 "L2" at L2_MB, graph 0.95 center tc rgb '#00aa00' font ',10'
+set label 3 "L3" at L3_MB, graph 0.95 center tc rgb '#0000ff' font ',10'
 
-plot 'updates_per_second.dat' using 1:($2 * BYTES_PER_UPDATE / 1.0e9) with linespoints pt 7 ps 1.5 lw 2 lc rgb '#0060ad' title 'Effective Bandwidth', \
-     PEAK_BW_GBS with lines lw 2 lc rgb '#dd181f' dashtype 2 title sprintf('Peak Memory BW (~%.0f GB/s)', PEAK_BW_GBS)
+plot 'updates_per_second.dat' using (mem_mb($1)):($2 * BYTES_PER_UPDATE / 1.0e9) with linespoints pt 7 ps 1.5 lw 2 lc rgb '#0060ad' title 'Effective BW', \
+     PEAK_BW_GBS with lines lw 2 lc rgb '#dd181f' dashtype 2 title 'Peak BW'
+
+unset logscale x
 
 # ============================================
 # Combined plot: GFLOPS and Bandwidth
 # ============================================
 set output 'performance_bandwidth.png'
 
-set title "Performance and Memory Bandwidth vs Grid Size" font ',14'
-set xlabel "Grid Size (N)"
+set title "Performance and Memory Bandwidth vs Memory Footprint" font ',14'
+set xlabel "Memory Footprint (MB)"
 set ylabel "GFLOPS" tc rgb '#0060ad'
 set y2label "Bandwidth (GB/s)" tc rgb '#dd181f'
 set y2tics
 set ytics nomirror
 set format y "%.1f"
 set format y2 "%.1f"
+set logscale x
 set grid
-set key top center
+set key top right box
 
 # Clear previous arrows/labels
 unset arrow 1
@@ -106,16 +113,17 @@ unset label 1
 unset label 2
 unset label 3
 
-# Redraw cache boundaries
-set arrow 1 from N_L1, graph 0 to N_L1, graph 1 nohead lc rgb '#888888' lw 1 dt 3
-set arrow 2 from N_L2, graph 0 to N_L2, graph 1 nohead lc rgb '#888888' lw 1 dt 3
-set arrow 3 from N_L3, graph 0 to N_L3, graph 1 nohead lc rgb '#888888' lw 1 dt 3
+# Redraw cache boundaries (in MB)
+set arrow 1 from L1_MB, graph 0 to L1_MB, graph 1 nohead lc rgb '#ff0000' lw 1 dt 3
+set arrow 2 from L2_MB, graph 0 to L2_MB, graph 1 nohead lc rgb '#00aa00' lw 1 dt 3
+set arrow 3 from L3_MB, graph 0 to L3_MB, graph 1 nohead lc rgb '#0000ff' lw 1 dt 3
 
-set label 1 "L1" at N_L1, graph 0.05 center tc rgb '#888888' font ',9'
-set label 2 "L2" at N_L2, graph 0.05 center tc rgb '#888888' font ',9'
-set label 3 "L3" at N_L3, graph 0.05 center tc rgb '#888888' font ',9'
+set label 1 "L1" at L1_MB, graph 0.05 center tc rgb '#ff0000' font ',9'
+set label 2 "L2" at L2_MB, graph 0.05 center tc rgb '#00aa00' font ',9'
+set label 3 "L3" at L3_MB, graph 0.05 center tc rgb '#0000ff' font ',9'
 
-plot 'grid_scaling.dat' using 1:4 with linespoints pt 7 ps 1.5 lw 2 lc rgb '#0060ad' title 'GFLOPS' axes x1y1, \
-     'updates_per_second.dat' using 1:($2 * BYTES_PER_UPDATE / 1.0e9) with linespoints pt 5 ps 1.5 lw 2 lc rgb '#dd181f' title 'Bandwidth (GB/s)' axes x1y2
+plot 'grid_scaling.dat' using 2:3 with linespoints pt 7 ps 1.5 lw 2 lc rgb '#0060ad' title 'GFLOPS' axes x1y1, \
+     'grid_scaling.dat' using 2:($0, mem_bw = 0) with lines notitle, \
+     'updates_per_second.dat' using (mem_mb($1)):($2 * BYTES_PER_UPDATE / 1.0e9) with linespoints pt 5 ps 1.5 lw 2 lc rgb '#dd181f' title 'Bandwidth (GB/s)' axes x1y2
 
 print "Plots generated: bandwidth_analysis.png, memory_bandwidth.png, performance_bandwidth.png"

@@ -42,7 +42,7 @@ set title "Parallel Efficiency"
 set xlabel "Number of Threads"
 set ylabel "Efficiency (%)"
 set yrange [0:110]
-set key bottom right
+set key top right
 
 plot 'thread_scaling.dat' using 1:6 with linespoints pt 7 ps 1.5 lw 2 lc rgb '#0060ad' title 'Efficiency', \
      100 with lines lw 2 lc rgb '#dd181f' dashtype 2 title 'Ideal (100%)'

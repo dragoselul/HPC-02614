@@ -9,9 +9,9 @@ set output 'grid_scaling.png'
 set multiplot layout 1,2 title "Poisson 3D Solver: Grid Size Scaling Analysis" font ',14'
 
 # Cache sizes in MB (adjust these for your CPU)
-L1_KB = 512        # L1 cache per core in KB
-L2_KB = 8192       # L2 cache per core in KB
-L3_MB = 32        # L3 cache total in MB
+L1_KB = 768        # L1 cache per core in KB
+L2_KB = 6144       # L2 cache per core in KB
+L3_MB = 60        # L3 cache total in MB
 
 L1_MB = L1_KB / 1024.0
 L2_MB = L2_KB / 1024.0
@@ -83,11 +83,12 @@ set terminal pngcairo size 1000,700 enhanced font 'Arial,12'
 set output 'cache_effects.png'
 
 set title "Cache Effects on Jacobi Solver Performance" font ',14'
-set xlabel "Grid Size (N)"
+set xlabel "Memory Footprint (MB)"
 set ylabel "GFLOPS" tc rgb '#0060ad'
-set y2label "Memory (MB)" tc rgb '#dd181f'
+set y2label "Grid Size (N)" tc rgb '#dd181f'
 set y2tics
 set ytics nomirror
+set logscale x
 set grid
 
 # Reset arrows
@@ -98,19 +99,19 @@ unset label 1
 unset label 2
 unset label 3
 
-# Cache boundary lines
-set arrow 1 from N_L1, graph 0 to N_L1, graph 1 nohead lc rgb '#ff0000' lw 2 dt 2
-set arrow 2 from N_L2, graph 0 to N_L2, graph 1 nohead lc rgb '#00aa00' lw 2 dt 2
-set arrow 3 from N_L3, graph 0 to N_L3, graph 1 nohead lc rgb '#0000ff' lw 2 dt 2
+# Cache boundary lines (in MB)
+set arrow 1 from L1_MB, graph 0 to L1_MB, graph 1 nohead lc rgb '#ff0000' lw 2 dt 2
+set arrow 2 from L2_MB, graph 0 to L2_MB, graph 1 nohead lc rgb '#00aa00' lw 2 dt 2
+set arrow 3 from L3_MB, graph 0 to L3_MB, graph 1 nohead lc rgb '#0000ff' lw 2 dt 2
 
-set label 1 "L1 Cache" at N_L1, graph 0.92 center tc rgb '#ff0000' font ',10'
-set label 2 "L2 Cache" at N_L2, graph 0.92 center tc rgb '#00aa00' font ',10'
-set label 3 "L3 Cache" at N_L3, graph 0.92 center tc rgb '#0000ff' font ',10'
+set label 1 "L1 Cache" at L1_MB, graph 0.92 center tc rgb '#ff0000' font ',10'
+set label 2 "L2 Cache" at L2_MB, graph 0.92 center tc rgb '#00aa00' font ',10'
+set label 3 "L3 Cache" at L3_MB, graph 0.92 center tc rgb '#0000ff' font ',10'
 
-set key top center
+set key top right
 
-plot 'grid_scaling.dat' using 1:3 with linespoints pt 7 ps 1.5 lw 2 lc rgb '#0060ad' title 'GFLOPS' axes x1y1, \
-     'grid_scaling.dat' using 1:2 with linespoints pt 5 ps 1.2 lw 2 lc rgb '#dd181f' title 'Memory (MB)' axes x1y2
+plot 'grid_scaling.dat' using 2:3 with linespoints pt 7 ps 1.5 lw 2 lc rgb '#0060ad' title 'GFLOPS' axes x1y1, \
+     'grid_scaling.dat' using 2:1 with linespoints pt 5 ps 1.2 lw 2 lc rgb '#dd181f' title 'Grid Size (N)' axes x1y2
 
 print "Plots generated: grid_scaling.png, cache_effects.png"
 
