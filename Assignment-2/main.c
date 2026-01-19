@@ -6,6 +6,7 @@
 #include "alloc3d.h"
 #include "print.h"
 #include "init.h"
+#include "jacobi.h"
 #include "timing.h"
 
 #ifdef _JACOBI
@@ -84,14 +85,17 @@ main(int argc, char *argv[]) {
 
     #ifdef _JACOBI
         // Benchmark to find optimal thread count (comment out if not needed)
-        int optimal_threads = find_optimal_threads(jacobi_omp, u, u_new, f, N, 100, &tolerance);
+        // int optimal_threads = find_optimal_threads(jacobi_omp, u, u_new, f, N, 100, &tolerance);
 
         // Benchmark grid sizes to show cache effects (comment out if not needed)
-        benchmark_grid_sizes(jacobi_omp, iter_max, tolerance, start_T, optimal_threads);
+        // benchmark_grid_sizes(jacobi_omp, iter_max, tolerance, start_T, optimal_threads);
 
         timer_start(&perf);
         iters = jacobi(u, u_new, f, N, iter_max, &tolerance);
         timer_stop(&perf, iters, N);
+		timer_start(&perf);
+		iters = jacobi_omp(u, u_new, f, N, iter_max, &tolerance);
+		timer_stop(&perf, iters, N);
     #endif
 
     #ifdef _GAUSS_SEIDEL

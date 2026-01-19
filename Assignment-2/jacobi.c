@@ -44,6 +44,10 @@ int jacobi_omp(double ***u, double ***u_new, double ***f, int N, int iter_max, d
     double delta = 2.0 / (N - 1);
     double delta2 = delta * delta;
     double one_sixth = 1.0 / 6.0;
+#ifdef _OPENMP
+    omp_set_num_threads(8);
+    omp_set_dynamic(0);
+#endif
 
     double d = INFINITY;
     int it = 0;
