@@ -1,0 +1,1 @@
+nvc++ -mp=gpu warmUpDevice.cpp -o warmUpDevic
