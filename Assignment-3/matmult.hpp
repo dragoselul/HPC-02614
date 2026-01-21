@@ -15,6 +15,8 @@ void matmult_nmk(int m, int n, int k, double** A, double** B, double** C);
 void matmult_nkm(int m, int n, int k, double** A, double** B, double** C);
 void matmult_blk(int m, int n, int k, double** A, double** B, double** C, int bs);
 void matmult_mkn_omp(int m, int n, int k, double** A, double** B, double** C);
+void matmult_mkn_offload(int m, int n, int k, double** A, double** B, double** C);
+void matmult_mnk_offload(int m, int n, int k, double** A, double** B, double** C);
 
 #ifdef __cplusplus
 }
