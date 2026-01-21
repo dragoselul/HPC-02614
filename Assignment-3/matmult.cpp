@@ -1,5 +1,6 @@
 /* matmult.cpp - Matrix multiplication implementations */
 #include "matmult.hpp"
+#include <cublas_v2.h>
 
 extern "C" {
 
@@ -168,6 +169,33 @@ void matmult_asy_offload(int m, int n, int k, double** A, double** B, double** C
     }
     #pragma omp taskwait
     #undef NUM_SLABS
+}
+
+void matmult_lib_offload(int m, int n, int k, double** A, double** B, double** C) {
+    cublasHandle_t handle;
+    cublasCreate(&handle);
+    
+    const double alpha = 1.0;
+    const double beta = 0.0;
+    
+    double *d_A = A[0];
+    double *d_B = B[0];
+    double *d_C = C[0];
+    
+    #pragma omp target data map(to:A[0:m][0:k],B[0:k][0:n]) map(from:C[0:m][0:n]) use_device_addr(d_A,d_B,d_C)
+    {
+        // CUBLAS uses column-major, C uses row-major
+        // C = A*B in row-major is equivalent to C^T = B^T*A^T in column-major
+        cublasDgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N,
+                    n, m, k,
+                    &alpha,
+                    d_B, n,
+                    d_A, k,
+                    &beta,
+                    d_C, n);
+    }
+    
+    cublasDestroy(handle);
 }
 
 } // extern "C"
