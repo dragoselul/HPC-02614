@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <omp.h>
 
-double*** d_malloc_3d(int m, int n, int k)
+double*** d_malloc_3d(int m, int n, int k, double* a)
 {
     if (m <= 0 || n <= 0 || k <= 0) return nullptr;
 
@@ -13,7 +13,7 @@ double*** d_malloc_3d(int m, int n, int k)
     for (int i = 0; i < m; i++)
         p[i] = (double**)p + m + i * n;
 
-    double* a = (double*)omp_target_alloc(m * n * k * sizeof(double), omp_get_num_devices());
+    a = (double*)omp_target_alloc(m * n * k * sizeof(double), omp_get_num_devices());
     if (!a) { free(p); return nullptr; }
 
     #pragma omp target is_device_ptr(p, a)
