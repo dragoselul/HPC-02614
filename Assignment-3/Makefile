@@ -1,10 +1,10 @@
 TARGET= libmatmult.so
-OBJS	= matmult_c.o
+OBJS	= matmult.o
 
 CC	= nvc
 CXX	= nvc++
 
-OPT	= -g -fast -Msafeptr -Minfo -mp=gpu -gpu=mem:separate:pinnedalloc -gpu=lineinfo -gpu=cc90 -cuda -mp=noautopar -cudalib=cublas
+OPT	= -g -fast -Msafeptr -Minfo -mp -mp=gpu -gpu=mem:separate:pinnedalloc -gpu=lineinfo -gpu=cc90 -cuda -cudalib=cublas
 PIC   = -fpic -shared
 ISA	=
 PARA	=

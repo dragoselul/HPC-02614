@@ -1,6 +1,8 @@
 /* matmult.cpp - Matrix multiplication implementations */
 #include "matmult.hpp"
 
+extern "C" {
+
 void matmult_nat(int m, int n, int k, double** A, double** B, double** C) {
     for (int i = 0; i < m; i++)
         for (int j = 0; j < n; j++) {
@@ -83,3 +85,17 @@ void matmult_blk(int m, int n, int k, double** A, double** B, double** C, int bs
                         for (int j2 = j1; j2 < j1 + bs && j2 < n; j2++)
                             C[i2][j2] += A[i2][s2] * B[s2][j2];
 }
+
+void matmult_mkn_omp(int m, int n, int k, double** A, double** B, double** C) {
+    #pragma omp parallel for
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++)
+            C[i][j] = 0.0;
+    #pragma omp parallel for
+    for (int i = 0; i < m; i++)
+        for (int s = 0; s < k; s++)
+            for (int j = 0; j < n; j++)
+                C[i][j] += A[i][s] * B[s][j];
+}
+
+} // extern "C"
