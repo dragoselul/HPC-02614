@@ -79,7 +79,7 @@ void matmult_blk(int m, int n, int k, double** A, double** B, double** C, int bs
             C[i][j] = 0.0;
     for (int i1 = 0; i1 < m; i1 += bs)
         for (int s1 = 0; s1 < k; s1 += bs)
-            for (int j1 = 0; j1 < n; j1 += bs)bjob
+            for (int j1 = 0; j1 < n; j1 += bs)
                 for (int i2 = i1; i2 < i1 + bs && i2 < m; i2++)
                     for (int s2 = s1; s2 < s1 + bs && s2 < k; s2++)
                         for (int j2 = j1; j2 < j1 + bs && j2 < n; j2++)
@@ -119,6 +119,55 @@ void matmult_mnk_offload(int m, int n, int k, double** A, double** B, double** C
                 sum += A[i][s] * B[s][j];
             C[i][j] = sum;
         }
+}
+
+void matmult_blk_offload(int m, int n, int k, double** A, double** B, double** C, int bs) {
+    #define BLK_SIZE 8
+    #pragma omp target teams distribute parallel for collapse(2) map(to:A[0:m][0:k],B[0:k][0:n]) map(from:C[0:m][0:n])
+    for (int i1 = 0; i1 < m; i1 += BLK_SIZE)
+        for (int j = 0; j < n; j++) {
+            double sum[BLK_SIZE];
+            #pragma unroll
+            for (int i2 = 0; i2 < BLK_SIZE; i2++)
+                sum[i2] = 0.0;
+            for (int s = 0; s < k; s++) {
+                #pragma unroll
+                for (int i2 = 0; i2 < BLK_SIZE; i2++) {
+                    if (i1 + i2 < m)
+                        sum[i2] += A[i1 + i2][s] * B[s][j];
+                }
+            }
+            #pragma unroll
+            for (int i2 = 0; i2 < BLK_SIZE; i2++) {
+                if (i1 + i2 < m)
+                    C[i1 + i2][j] = sum[i2];
+            }
+        }
+    #undef BLK_SIZE
+}
+
+void matmult_asy_offload(int m, int n, int k, double** A, double** B, double** C) {
+    #define NUM_SLABS 4
+    int slab_size = m / NUM_SLABS;
+    
+    for (int slab = 0; slab < NUM_SLABS; slab++) {
+        int i_start = slab * slab_size;
+        int i_end = i_start + slab_size;
+        
+        #pragma omp target teams distribute parallel for collapse(2) nowait \
+            map(to:A[i_start:slab_size][0:k],B[0:k][0:n]) \
+            map(from:C[i_start:slab_size][0:n]) \
+            depend(out:C[i_start])
+        for (int i = i_start; i < i_end; i++)
+            for (int j = 0; j < n; j++) {
+                double sum = 0.0;
+                for (int s = 0; s < k; s++)
+                    sum += A[i][s] * B[s][j];
+                C[i][j] = sum;
+            }
+    }
+    #pragma omp taskwait
+    #undef NUM_SLABS
 }
 
 } // extern "C"
