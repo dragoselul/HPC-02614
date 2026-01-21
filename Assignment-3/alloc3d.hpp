@@ -4,7 +4,7 @@
 
 double*** malloc_3d(int m, int n, int k);
 void free_3d(double*** p);
-double*** d_malloc_3d(int m, int n, int k, double* a);
+double*** d_malloc_3d(int m, int n, int k, double** a);
 void d_free_3d(double*** p, double* a);
 
 #endif
