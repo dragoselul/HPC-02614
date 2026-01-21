@@ -1,60 +1,22 @@
-# Makefile for Assignment-3
+TARGET= libmatmult.so
+OBJS	= matmult_c.o
 
-# Compiler (default: nvc++)
-CXX = nvc++
+CC	= nvc
+CXX	= nvc++
 
-# Options
-OPT = -O3
-CHIP =
-ISA =
-PARA = -mp
-GPU = -acc -gpu=cc88
-XOPTS =
+OPT	= -g -fast -Msafeptr -Minfo -mp=gpu -gpu=mem:separate:pinnedalloc -gpu=lineinfo -gpu=cc90 -cuda -mp=noautopar -cudalib=cublas
+PIC   = -fpic -shared
+ISA	=
+PARA	=
+INC   =
+LIBS	=
 
-# Combine flags
-CXXFLAGS = $(OPT) $(CHIP) $(ISA) $(PARA) $(GPU) $(XOPTS)
-LDFLAGS = -lm
+CXXFLAGS= $(OPT) $(PIC) $(INC) $(ISA) $(PARA) $(XOPT)
 
-# Sources
-COMMON_SRCS = alloc3d.cpp init.cpp timing.cpp print.cpp
-COMMON_OBJS = $(COMMON_SRCS:.cpp=.o)
+all: $(TARGET)
 
-JACOBI_SRCS = jacobi.cpp
-JACOBI_OBJS = $(JACOBI_SRCS:.cpp=.o)
-
-GAUSS_SRCS = gauss_seidel.cpp
-GAUSS_OBJS = $(GAUSS_SRCS:.cpp=.o)
-
-MATMULT_SRCS = matmult.cpp
-MATMULT_OBJS = $(MATMULT_SRCS:.cpp=.o)
-
-# Targets
-TARGET_J = poisson_j
-TARGET_GS = poisson_gs
-TARGET_LIB = libmatmult.so
-
-all: $(TARGET_J) $(TARGET_GS) $(TARGET_LIB)
-
-$(TARGET_J): main_j.o $(COMMON_OBJS) $(JACOBI_OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
-
-$(TARGET_GS): main_gs.o $(COMMON_OBJS) $(GAUSS_OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
-
-$(TARGET_LIB): $(MATMULT_OBJS)
-	$(CXX) $(CXXFLAGS) -shared -o $@ $^ $(LDFLAGS)
-
-main_j.o: main.cpp
-	$(CXX) $(CXXFLAGS) -D_JACOBI -c $< -o $@
-
-main_gs.o: main.cpp
-	$(CXX) $(CXXFLAGS) -D_GAUSS_SEIDEL -c $< -o $@
-
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(TARGET): $(OBJS) 
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJS) $(LIBS)
 
 clean:
-	rm -f *.o
-
-realclean: clean
-	rm -f $(TARGET_J) $(TARGET_GS) $(TARGET_LIB)
+	@/bin/rm -f $(TARGET) $(OBJS)
