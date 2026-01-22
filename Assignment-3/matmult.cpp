@@ -122,7 +122,7 @@ void matmult_mkn_omp(int m, int n, int k, double* A, double* B, double* C) {
 
 void matmult_lib(int m, int n, int k, double* A, double* B, double* C) {
     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
-                m, n, k, 1.0, A[0], k, B[0], n, 0.0, C[0], n);
+                m, n, k, 1.0, A, k, B, n, 0.0, C, n);
 }
 
 void matmult_mkn_offload(int m, int n, int k, double* A, double* B, double* C) {
