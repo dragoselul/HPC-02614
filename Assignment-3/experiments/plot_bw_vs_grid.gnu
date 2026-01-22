@@ -4,6 +4,7 @@ set output 'bandwidth_vs_grid.png'
 set title "Jacobi GPU Solver: Effective Memory Bandwidth (H100)"
 set xlabel "Grid Size (N)"
 set ylabel "Bandwidth (GB/s)"
+set logscale y
 set grid
 set key top right
 

@@ -4,6 +4,7 @@ set output 'gflops_vs_grid.png'
 set title "Jacobi GPU Solver: GFLOPS vs Grid Size"
 set xlabel "Grid Size (N)"
 set ylabel "GFLOPS"
+set logscale y
 set grid
 set key top left
 

@@ -4,6 +4,7 @@ set output 'updates_vs_grid.png'
 set title "Jacobi GPU Solver: Million Updates per Second"
 set xlabel "Grid Size (N)"
 set ylabel "Million Updates/s"
+set logscale y
 set grid
 set key top left
 

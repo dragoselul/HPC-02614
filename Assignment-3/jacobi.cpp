@@ -34,8 +34,7 @@ int jacobi_ref(double*** u, double*** u_new, double*** f, int N, int iter_max, d
     return it;
 }
 
-int jacobi_offload(double*** u, double*** u_new, double*** f,
-                   int N, int iter_max, double* tolerance)
+int jacobi_offload(double*** u, double*** u_new, double*** f, int N, int iter_max, double* tolerance)
 {
     double delta2 = (2.0 / (N - 1)) * (2.0 / (N - 1));
 
