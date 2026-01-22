@@ -14,7 +14,7 @@ OUTPUT="data.txt"
 > $OUTPUT
 
 # Problem sizes
-SIZES=(100 200 500 1000 2000 5000)
+SIZES=(100 200 500 1000 2000 5000 10000)
 
 # Extract data for each method
 for METHOD in "mkn_omp" "mkn_offload" "mnk_offload" "blk_offload" "asy_offload" "lib_offload"; do
