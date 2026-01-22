@@ -52,52 +52,61 @@ int main(int argc, char* argv[]) {
     int iters_ref = 0, iters_off = 0, iters_off2 = 0, iters_off_norm = 0, iters_ref_norm = 0;
 
     printf("Running Jacobi solver...\n");
-
+    
     // Reference (CPU/OpenMP) run
     initialize(u, u_new, f, N, start_T);
     timer_start(perf_ref);
     iters_ref = jacobi_ref(u, u_new, f, N, iter_max, &tolerance);
     timer_stop(perf_ref, iters_ref, N);
     print_performance(perf_ref);
-
+/*
     // Offload run wih map
     initialize(u, u_new, f, N, start_T);
     timer_start(perf_off);
     iters_off = jacobi_offload(u, u_new, f, N, iter_max, &tolerance);
     timer_stop(perf_off, iters_off, N);
     print_performance(perf_off);
-    /*
+    */
     // Offload2 run with distribute parallel for
+    /*
     initialize(u, u_new, f, N, start_T);
     timer_start(perf_off2);
     iters_off2 = jacobi_offload2(u, u_new, f, N, iter_max, &tolerance);
     timer_stop(perf_off2, iters_off2, N);
     print_performance(perf_off2);
     */
-
-    /*
+    
     // Offload run wih 2 GPUs
-    initialize(u, u_new, f, N, start_T);
-    timer_start(perf_off);
-    iters_off = jacobi_offload3(u, u_new, f, N, iter_max, &tolerance);
-    timer_stop(perf_off, iters_off, N);
-    print_performance(perf_off);*/
-
+    /*
+     initialize(u, u_new, f, N, start_T);
+     timer_start(perf_off);
+     iters_off = jacobi_offload3(u, u_new, f, N, iter_max, &tolerance);
+     timer_stop(perf_off, iters_off, N);
+     print_performance(perf_off);
+     */
+    /*
     // Reference (CPU/OpenMP) run with norm
     initialize(u, u_new, f, N, start_T);
     timer_start(perf_ref_norm);
-    iters_ref = jacobi_ref(u, u_new, f, N, iter_max, &tolerance);
+    iters_ref = jacobi_ref_norm(u, u_new, f, N, iter_max, &tolerance);
     timer_stop(perf_ref_norm, iters_ref_norm, N);
     print_performance(perf_ref_norm);
 
     // Offload run wih map with norm
     initialize(u, u_new, f, N, start_T);
     timer_start(perf_off_norm);
-    iters_off = jacobi_offload(u, u_new, f, N, iter_max, &tolerance);
+    iters_off = jacobi_offload_norm(u, u_new, f, N, iter_max, &tolerance);
     timer_stop(perf_off_norm, iters_off_norm, N);
     print_performance(perf_off_norm);
 
     print_speedup(perf_ref, perf_off, perf_off2, perf_ref_norm, perf_off_norm);
+    */
+
+    // Benchmarking
+    //benchmark_grid_sizes_gpu(jacobi_offload, iter_max, start_T, "gpu_map", tolerance);
+    // benchmark_grid_sizes_gpu(jacobi_offload2, iter_max, start_T, "gpu_memcpy", tolerance);
+    // benchmark_grid_sizes_gpu(jacobi_offload3, iter_max, start_T, "gpu_dual", tolerance);
+
 
     switch (output_type) {
         case 3:
