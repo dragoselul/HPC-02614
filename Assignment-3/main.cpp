@@ -48,17 +48,17 @@ int main(int argc, char* argv[]) {
 
     warmup_device();
 
-    PerfData perf_ref, perf_off, perf_off2, perf_ref_norm, perf_off_norm;
-    int iters_ref = 0, iters_off = 0, iters_off2 = 0, iters_off_norm = 0, iters_ref_norm = 0;
+    // PerfData perf_ref, perf_off, perf_off2, perf_ref_norm, perf_off_norm;
+    // int iters_ref = 0, iters_off = 0, iters_off2 = 0, iters_off_norm = 0, iters_ref_norm = 0;
 
     printf("Running Jacobi solver...\n");
     
-    // Reference (CPU/OpenMP) run
-    initialize(u, u_new, f, N, start_T);
-    timer_start(perf_ref);
-    iters_ref = jacobi_ref(u, u_new, f, N, iter_max, &tolerance);
-    timer_stop(perf_ref, iters_ref, N);
-    print_performance(perf_ref);
+    // // Reference (CPU/OpenMP) run
+    // initialize(u, u_new, f, N, start_T);
+    // timer_start(perf_ref);
+    // iters_ref = jacobi_ref(u, u_new, f, N, iter_max, &tolerance);
+    // timer_stop(perf_ref, iters_ref, N);
+    // print_performance(perf_ref);
 /*
     // Offload run wih map
     initialize(u, u_new, f, N, start_T);
@@ -103,9 +103,9 @@ int main(int argc, char* argv[]) {
     */
 
     // Benchmarking
-    //benchmark_grid_sizes_gpu(jacobi_offload, iter_max, start_T, "gpu_map", tolerance);
-    // benchmark_grid_sizes_gpu(jacobi_offload2, iter_max, start_T, "gpu_memcpy", tolerance);
-    // benchmark_grid_sizes_gpu(jacobi_offload3, iter_max, start_T, "gpu_dual", tolerance);
+    benchmark_grid_sizes_gpu(jacobi_offload, iter_max, start_T, "gpu_map", tolerance);
+    benchmark_grid_sizes_gpu(jacobi_offload2, iter_max, start_T, "gpu_memcpy", tolerance);
+    benchmark_grid_sizes_gpu(jacobi_offload3, iter_max, start_T, "gpu_dual", tolerance);
 
 
     switch (output_type) {
