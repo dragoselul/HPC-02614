@@ -79,27 +79,30 @@ int jacobi_offload2(double*** u, double*** u_new, double*** f, int N, int iter_m
     double*** d_f = d_malloc_3d(N, N, N, &d_a_f);
     omp_target_memcpy(d_a_f, f[0][0], N*N*N*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
     
-    #pragma omp target is_device_ptr(d_a, d_u, d_a_new, d_u_new, d_a_f, d_f)
     while (it < iter_max) 
     {
-        #pragma omp target teams distribute parallel collapse(2)
+        //#pragma omp target teams distribute parallel //collapse(2)
+        #pragma omp target teams distribute parallel for collapse(3) \ 
+        is_device_ptr(d_a, d_a_new, d_a_f)
         for (int i = 1; i < N-1; i++)
             for (int j = 1; j < N-1; j++)
-                for (int k = 1; k < N-1; k++) {
-                    
+                for (int k = 1; k < N-1; k++) 
+                {
+                    int idx = (i*N + j)*N + k;
+
                     double val = (1.0/6.0) * (
-                        d_u[i-1][j][k] + d_u[i+1][j][k] +
-                        d_u[i][j-1][k] + d_u[i][j+1][k] +
-                        d_u[i][j][k-1] + d_u[i][j][k+1] +
-                        delta2 * d_f[i][j][k]);
+                        d_a[idx-N*N] + d_a[idx+N*N] +
+                        d_a[idx-N] + d_a[idx+N] +
+                        d_a[idx-1] + d_a[idx+1] +
+                        delta2 * d_a_f[idx]);
                     
-                    d_u_new[i][j][k] = val;
+                    d_a_new[idx] = val;
                 }
 
-        //double*** tmp = u; u = u_new; u_new = tmp;
+        double* tmp = d_a; d_a = d_a_new; d_a_new = tmp;
         it++;
     }
-    omp_target_memcpy(u[0][0], d_u_new[0][0], N*N*N*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
+    omp_target_memcpy(u[0][0], d_a, N*N*N*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
     
     return it;
 }
