@@ -28,7 +28,7 @@ double*** d_malloc_3d(int m, int n, int k, double** data)
 
 void d_free_3d(double*** p, double* a)
 {
-    if (p) { omp_target_free(p[0][0], omp_get_default_device()); omp_target_free(p, omp_get_default_device()); }
+    if (p) { omp_target_free(p, omp_get_default_device()); }
     if (a) { omp_target_free(a, omp_get_default_device()); }
 }
 
