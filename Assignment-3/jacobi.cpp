@@ -251,7 +251,7 @@ int jacobi_offload3(double*** u, double*** u_new, double*** f, int N, int iter_m
         double* tmp = d_a; d_a = d_a_new; d_a_new = tmp;
         it++;
     }
-    
+    omp_target_memcpy(u[0][0], d_a, N*N*N*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
     d_free_3d(d_u, d_a);
     d_free_3d(d_u_new, d_a_new);
     d_free_3d(d_f, d_a_f);
