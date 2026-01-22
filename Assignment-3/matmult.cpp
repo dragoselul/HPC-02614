@@ -3,6 +3,10 @@
 #include <cublas_v2.h>
 
 extern "C" {
+#include <cblas.h>
+}
+
+extern "C" {
 
 void matmult_nat(int m, int n, int k, double** A, double** B, double** C) {
     for (int i = 0; i < m; i++)
@@ -97,6 +101,11 @@ void matmult_mkn_omp(int m, int n, int k, double** A, double** B, double** C) {
         for (int s = 0; s < k; s++)
             for (int j = 0; j < n; j++)
                 C[i][j] += A[i][s] * B[s][j];
+}
+
+void matmult_lib(int m, int n, int k, double** A, double** B, double** C) {
+    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
+                m, n, k, 1.0, A[0], k, B[0], n, 0.0, C[0], n);
 }
 
 void matmult_mkn_offload(int m, int n, int k, double** A, double** B, double** C) {

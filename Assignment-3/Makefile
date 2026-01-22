@@ -9,7 +9,7 @@ PIC   = -fpic -shared
 ISA	=
 PARA	=
 INC   =
-LIBS	=
+LIBS	= -lblas -lcblas
 
 CXXFLAGS= $(OPT) $(PIC) $(INC) $(ISA) $(PARA) $(XOPT)
 
