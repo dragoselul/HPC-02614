@@ -62,7 +62,7 @@ void print_speedup(const PerfData& perf_ref, const PerfData& perf_off, const Per
 
 void benchmark_grid_sizes_gpu(solver_func_t solver, int iter_max, double start_T, const char *label, double tolerance)
 {
-    int grid_sizes[] = {32, 48, 64, 96, 128, 160, 192, 256};
+    int grid_sizes[] = {32, 48, 64, 96, 128, 160, 192, 256, 512};
     int num_sizes = sizeof(grid_sizes) / sizeof(grid_sizes[0]);
 
     FILE *fp;
@@ -75,13 +75,14 @@ void benchmark_grid_sizes_gpu(solver_func_t solver, int iter_max, double start_T
         return;
     }
 
+    printf("Benchmarking solver '%s'\n", label);
     fprintf(fp, "# N Memory_MB Time_s MUpdates_per_s GFLOPS Bandwidth_GB_s\n");
-    printf("GPU Benchmark (%s): N | Memory_MB | Time_s | MUpdates/s | GFLOPS | BW_GB/s\n", label);
+    printf("    N|   Memory_MB|   Time_s|  MUpdates/s|  GFLOPS | BW_GB/s\n", label);
 
 
     for (int i = 0; i < num_sizes; i++) {
-    
-        int N = grid_sizes[i] + 2;
+
+        int N = grid_sizes[i];
         double memory_mb =
             3.0 * N * N * N * sizeof(double) / (1024.0 * 1024.0);
 
