@@ -1,0 +1,74 @@
+#!/bin/bash
+# 02614 - High-Performance Computing
+# Profiling Script using Nsight Compute (ncu)
+#
+# Usage: bsub < profile_job.sh  (Defaults to N=2048)
+#    OR: bsub -env "SIZE=4096" < profile_job.sh
+#
+#BSUB -J mm_profile
+#BSUB -o mm_profile_%J.out
+#BSUB -q hpcintrogpu
+#BSUB -n 4
+#BSUB -R "rusage[mem=8192]"
+#BSUB -W 15
+#BSUB -R "span[hosts=1]"
+#BSUB -gpu "num=1:mode=exclusive_process"
+
+# --- CONFIGURATION ---
+EXECUTABLE=matmult_f.nvc++
+
+# Default size if not provided via bsub -env "SIZE=..."
+if [ -z "$SIZE" ]; then
+    SIZE=10000
+fi
+
+# Block size for 'blk_offload' (match your best tuning)
+BLK_SIZE=32
+
+# GPU Methods to Profile (Skipping CPU methods)
+# You can remove methods here if you only want to test specific ones
+METHODS="mkn_offload mnk_offload blk_offload asy_offload lib_offload"
+# METHODS="asy_offload"
+# Load modules
+module load nvhpc/25.11
+
+echo "========================================="
+echo "PROFILING JOB STARTED"
+echo "Matrix Size (N): $SIZE"
+echo "Block Size (blk_offload): $BLK_SIZE"
+echo "========================================="
+
+export OMP_TOOL_LIBRARIES=$CUDA_HOME/lib64/libomptarget.so
+
+# --- PROFILING LOOP ---
+for TYPE in $METHODS
+do
+    echo "--------------------------------------------------"
+    echo "Profiling Method: $TYPE"
+    echo "--------------------------------------------------"
+
+    # Construct the command arguments based on type
+    if [ "$TYPE" == "blk_offload" ]; then
+        ARGS="$TYPE $SIZE $SIZE $SIZE $BLK_SIZE"
+    else
+        ARGS="$TYPE $SIZE $SIZE $SIZE"
+    fi
+
+    # OUTPUT FILENAME: profile_mnk_offload_2048.ncu-rep
+    OUTFILE="profile_${TYPE}_${SIZE}"
+
+    # RUN NSIGHT COMPUTE
+    # --set full           : Collects detailed metrics (occupancy, memory, compute)
+    # --launch-count 1     : Profiles only the first kernel launch (saves massive time)
+    # --target-processes all : Ensures we catch the offloaded process
+    # -f                   : Overwrite existing files
+    # -o                   : Output file name
+
+    nsys profile --trace=cuda,openmp --stats=true -o "$OUTFILE" ./$EXECUTABLE $ARGS
+
+    echo "Saved report to: ${OUTFILE}.ncu-rep"
+done
+
+echo "========================================="
+echo "PROFILING JOB COMPLETED"
+echo "========================================="

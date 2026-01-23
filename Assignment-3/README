@@ -28,7 +28,7 @@ matmult_f.nvcc type m n k [bs]
 where m, n, k are the parameters defining the matrix sizes, bs is the
 optional blocksize for the block version, and type can be one of:
 
-nat           - the native/naïve version
+nat           - the native/naï¿½ve version
 lib           - the library version (note that CBLAS is now linked to a
                 multithreaded library that supports OMP_NUM_THREADS)
 mkn_omp       - the OpenMP mkn version
