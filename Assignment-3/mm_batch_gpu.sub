@@ -27,13 +27,13 @@ SIZES="100 200 500 1000 2000 5000 10000"
 
 # define all method types to test
 #
-TYPES="mkn_omp mkn_offload mnk_offload blk_offload asy_offload lib_offload"
+TYPES="mkn_omp lib mkn_offload mnk_offload blk_offload asy_offload lib_offload"
 #Uncomment next line to test specific implemenation
 #TYPES="lib_offload"
 
 # enable(1)/disable(0) result checking
 export MATMULT_COMPARE=0
-
+export LIBOMPTARGET_INFO=4
 nvidia-smi
 # load module for shared cuda libraries
 module load nvhpc/25.11

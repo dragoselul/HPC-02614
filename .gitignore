@@ -19,6 +19,8 @@ libmatmult.so
 *.out
 *.png
 *.err
+*.nsys-rep
+*.sqlite
 Week-3
 
 # CLion
