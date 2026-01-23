@@ -61,7 +61,7 @@ void print_speedup(const PerfData& perf_ref, const PerfData& perf_off, const Per
 
 }
 
-int find_optimal_threads(solver_func_t solver, int iter_max, int N, double start_T, const char *label, double tolerance) {
+int benchmark_threads(solver_func_t solver, int iter_max, int N, double start_T, const char *label, double tolerance) {
     int max_threads = 64;
 
     omp_set_dynamic(0);
