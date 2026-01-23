@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <omp.h>
 
+
 double get_time() {
     return omp_get_wtime();
 }
@@ -58,6 +59,87 @@ void print_speedup(const PerfData& perf_ref, const PerfData& perf_off, const Per
     else
         printf("Speedup jacobi_ref_norm -> jacobi_offload_norm: N/A (zero time)\n");
 
+}
+
+int find_optimal_threads(solver_func_t solver, int iter_max, int N, double start_T, const char *label, double tolerance) {
+    int max_threads = 64;
+
+    omp_set_dynamic(0);
+
+    
+    int optimal_threads = 1;
+    
+    double best_time = 1e30;
+    double base_time = 0.0, base_gflops = 0.0;
+
+
+    FILE *fp;
+    char filename[256];
+    snprintf(filename, sizeof(filename), "experiments/thread_scaling_%s.dat", label);
+
+    fp = fopen(filename, "w");
+    if (!fp) {
+        fprintf(stderr, "Error: Cannot open %s\n", filename);
+        return;
+    }
+    
+    printf("Threads solver '%s'\n", label);
+    fprintf(fp, "# Threads Time(s) GFLOPS IdealGFLOPS Speedup Efficiency\n");
+    printf("Threads | Time(s)     | GFLOPS  | Speedup\n", label);
+    
+    for (int t = 1; t <= max_threads; t=t*2) {
+
+        omp_set_num_threads(t);
+
+        double tol = tolerance;
+        PerfData perf;
+        
+        double ***u     = malloc_3d(N, N, N);
+        double ***u_new = malloc_3d(N, N, N);
+        double ***f     = malloc_3d(N, N, N);
+
+        if (!u || !u_new || !f) {
+            fprintf(stderr, "Alloc failed for N=%d\n", N);
+            continue;
+        }
+        
+        initialize(u, u_new, f, N, start_T);
+        
+        timer_start(perf);
+        solver(u, u_new, f, N, iter_max, &tolerance);
+        timer_stop(perf, iter_max, N);
+
+        if (t == 1) {
+            base_time = perf.elapsed;
+            base_gflops = perf.gflops;
+        }
+        
+        double speedup = base_time / perf.elapsed;
+        double efficiency = (speedup / t) * 100.0;
+        double ideal_gflops = base_gflops * t;
+
+        printf("%7d | %11.6f | %7.3f | %5.2fx\n", t, perf.elapsed, perf.gflops, speedup);
+        fprintf(fp, "%d %.6f %.3f %.3f %.2f %.1f\n",
+                t, perf.elapsed, perf.gflops, ideal_gflops, speedup, efficiency);
+
+        if (perf.elapsed < best_time) {
+            best_time = perf.elapsed;
+            optimal_threads = t;
+        }
+            
+        free_3d(u);
+        free_3d(u_new);
+        free_3d(f);
+        
+    }
+
+    fclose(fp);
+    printf("Optimal: %d threads\n", optimal_threads);
+
+
+    //omp_set_num_threads(optimal_threads);
+    
+    return optimal_threads;
 }
 
 void benchmark_grid_sizes_gpu(solver_func_t solver, int iter_max, double start_T, const char *label, double tolerance)

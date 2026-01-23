@@ -21,5 +21,6 @@ void timer_stop(PerfData& perf, int iterations, int N);
 void print_performance(const PerfData& perf);
 void print_speedup(const PerfData& perf_ref, const PerfData& perf_off, const PerfData& perf_off2, const PerfData& perf_ref_norm, const PerfData& perf_off_norm);
 void benchmark_grid_sizes_gpu(solver_func_t solver, int iter_max, double start_T, const char *label, double tolerance);
+int find_optimal_threads(solver_func_t solver, int iter_max, int N, double start_T, const char *label, double tolerance);
 
 #endif
