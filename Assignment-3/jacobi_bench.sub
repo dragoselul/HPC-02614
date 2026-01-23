@@ -1,0 +1,42 @@
+#!/bin/bash
+#
+#BSUB -J jacobi_bench
+#BSUB -o jacobi_bench_%J.out
+#BSUB -q hpcintrogpu
+#BSUB -n 32
+#BSUB -W 15
+#BSUB -R "rusage[mem=2048]"
+#BSUB -R "span[hosts=1]"
+#BSUB -gpu "num=2:mode=exclusive_process"
+#BSUB -o jacobi_%J.out
+#BSUB -e jacobi_%J.err
+
+module load nvhpc/25.11
+
+make -f Makefile_p clean && make -f Makefile_p
+
+export OMP_NUM_THREADS=8
+export OMP_PROC_BIND=spread
+export OMP_PLACES=cores
+
+EXEC=./poisson
+N=100
+ITER=1000
+TOL=0.01
+START_T=0.0
+
+echo "=== GPU map ==="
+export CUDA_VISIBLE_DEVICES=0
+./poisson gpu_map $N $ITER $TOL $START_T
+
+echo "=== GPU memcpy ==="
+export CUDA_VISIBLE_DEVICES=0
+./poisson gpu_memcpy $N $ITER $TOL $START_T
+
+echo "=== GPU dual ==="
+export CUDA_VISIBLE_DEVICES=0,1
+./poisson gpu_dual $N $ITER $TOL $START_T
+
+echo "=== GPU map norm ==="
+export CUDA_VISIBLE_DEVICES=0
+./poisson gpu_norm $N $ITER $TOL $START_T

@@ -188,7 +188,6 @@ int jacobi_offload_norm(double*** u, double*** u_new, double*** f, int N, int it
 
                         u_new[i][j][k] = val;
                     }
-            printf("d = %f\n", d);
             if (d < *tolerance) break;
 
             double ***tmp = u;
@@ -196,7 +195,6 @@ int jacobi_offload_norm(double*** u, double*** u_new, double*** f, int N, int it
             u_new = tmp;
 
             iter++;
-            printf("iteration %d, d = %f\n", iter, d);
         }
     }
     return iter;

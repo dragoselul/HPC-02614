@@ -80,7 +80,7 @@ int benchmark_threads(solver_func_t solver, int iter_max, int N, double start_T,
     fp = fopen(filename, "w");
     if (!fp) {
         fprintf(stderr, "Error: Cannot open %s\n", filename);
-        return;
+        return 0;
     }
     
     printf("Threads solver '%s'\n", label);
@@ -91,7 +91,6 @@ int benchmark_threads(solver_func_t solver, int iter_max, int N, double start_T,
 
         omp_set_num_threads(t);
 
-        double tol = tolerance;
         PerfData perf;
         
         double ***u     = malloc_3d(N, N, N);
