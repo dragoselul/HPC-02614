@@ -58,21 +58,27 @@ int main(int argc, char* argv[]) {
     timer_start(perf);
 
     if (strcmp(solver, "cpu") == 0) {
+        int iters = benchmark_threads(jacobi_ref, iter_max, N, start_T, "CPU_reference", tolerance);
         benchmark_grid_sizes_gpu(jacobi_ref, iter_max, start_T, "CPU_reference", tolerance);
 
     } else if (strcmp(solver, "gpu_map") == 0) {
+        int iters = benchmark_threads(jacobi_offload2, iter_max, N, start_T, "GPU_map", tolerance);        
         benchmark_grid_sizes_gpu(jacobi_offload, iter_max, start_T, "GPU_map", tolerance);
 
     } else if (strcmp(solver, "gpu_memcpy") == 0) {
+        int iters = benchmark_threads(jacobi_offload2, iter_max, N, start_T, "GPU_memcpy", tolerance);
         benchmark_grid_sizes_gpu(jacobi_offload2, iter_max, start_T, "GPU_memcpy", tolerance);
 
     } else if (strcmp(solver, "gpu_dual") == 0) {
+        int iters = benchmark_threads(jacobi_offload3, iter_max, N, start_T, "GPU_dual", tolerance);
         benchmark_grid_sizes_gpu(jacobi_offload3, iter_max, start_T, "GPU_dual", tolerance);
 
     } else if (strcmp(solver, "cpu_norm") == 0) {
+        int iters = benchmark_threads(jacobi_ref_norm, iter_max, N, start_T, "CPU_reference_norm", tolerance);
         benchmark_grid_sizes_gpu(jacobi_ref_norm, iter_max, start_T, "CPU_reference_norm", tolerance);
         
     } else if (strcmp(solver, "gpu_norm") == 0) {
+        int iters = benchmark_threads(jacobi_offload_norm, iter_max, N, start_T, "GPU_norm", tolerance);
         benchmark_grid_sizes_gpu(jacobi_offload_norm, iter_max, start_T, "GPU_norm", tolerance);
     } else {
         fprintf(stderr, "Unknown solver: %s\n", solver);
@@ -80,7 +86,7 @@ int main(int argc, char* argv[]) {
     }
 
     timer_stop(perf, iters, N);
-    print_performance(perf);
+    // print_performance(perf);
 
     switch (output_type) {
         case 3:
