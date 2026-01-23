@@ -3,19 +3,19 @@
 #include <cstdlib>
 #include <omp.h>
 
-double*** d_malloc_3d(int m, int n, int k, double** data)
+double*** d_malloc_3d(int m, int n, int k, double** data, int device)
 {
     if (m <= 0 || n <= 0 || k <= 0) return nullptr;
 
-    double*** p = (double***)omp_target_alloc(m * sizeof(double**) + m * n * sizeof(double*), omp_get_default_device());
+    double*** p = (double***)omp_target_alloc(m * sizeof(double**) + m * n * sizeof(double*), device);
     if (!p) return nullptr;
 
     #pragma omp target is_device_ptr(p)
     for (int i = 0; i < m; i++)
         p[i] = (double**)p + m + i * n;
 
-    double *a = (double*)omp_target_alloc(m * n * k * sizeof(double), omp_get_default_device());
-    if (!a) { omp_target_free(p, omp_get_default_device()); return nullptr; }
+    double *a = (double*)omp_target_alloc(m * n * k * sizeof(double), device);
+    if (!a) { omp_target_free(p, device); return nullptr; }
 
     #pragma omp target is_device_ptr(p, a)
     for (int i = 0; i < m; i++)
@@ -26,10 +26,10 @@ double*** d_malloc_3d(int m, int n, int k, double** data)
     return p;
 }
 
-void d_free_3d(double*** p, double* a)
+void d_free_3d(double*** p, double* a, int device)
 {
-    if (p) { omp_target_free(p, omp_get_default_device()); }
-    if (a) { omp_target_free(a, omp_get_default_device()); }
+    if (p) { omp_target_free(p, device); }
+    if (a) { omp_target_free(a, device); }
 }
 
 double*** malloc_3d(int m, int n, int k) {
