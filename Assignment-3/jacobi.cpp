@@ -34,6 +34,7 @@ int jacobi_ref(double*** u, double*** u_new, double*** f, int N, int iter_max, d
     return it;
 }
 
+//#pragma omp target teams distribute parallel for collapse(3)  is_device_ptr(u, u_new, f)
 int jacobi_offload(double*** u, double*** u_new, double*** f, int N, int iter_max, double* tolerance)
 {
     double delta2 = (2.0 / (N - 1)) * (2.0 / (N - 1));
@@ -42,33 +43,30 @@ int jacobi_offload(double*** u, double*** u_new, double*** f, int N, int iter_ma
         map(to: u[0:N][0:N][0:N], f[0:N][0:N][0:N]) \
         map(alloc: u_new[0:N][0:N][0:N])
     {
-        #pragma omp target teams
-        {
-            for (int it = 0; it < iter_max; ++it) {
+        for (int it = 0; it < iter_max; ++it) {
 
-                #pragma omp parallel for collapse(2)
-                for (int i = 1; i < N-1; i++)
-                    for (int j = 1; j < N-1; j++)
-                        for (int k = 1; k < N-1; k++) {
+            //#pragma omp parallel for collapse(2)
+            #pragma omp target teams distribute parallel for collapse(3)  is_device_ptr(u, u_new, f)
+            for (int i = 1; i < N-1; i++)
+                for (int j = 1; j < N-1; j++)
+                    for (int k = 1; k < N-1; k++) {
 
-                            double val = (1.0 / 6.0) * (
-                                u[i-1][j][k] + u[i+1][j][k] +
-                                u[i][j-1][k] + u[i][j+1][k] +
-                                u[i][j][k-1] + u[i][j][k+1] +
-                                delta2 * f[i][j][k]
-                            );
+                        double val = (1.0 / 6.0) * (
+                            u[i-1][j][k] + u[i+1][j][k] +
+                            u[i][j-1][k] + u[i][j+1][k] +
+                            u[i][j][k-1] + u[i][j][k+1] +
+                            delta2 * f[i][j][k]
+                        );
 
-                            u_new[i][j][k] = val;
-                        }
+                        u_new[i][j][k] = val;
+                    }
 
-                // swap pointers ON DEVICE
-                double*** tmp = u;
-                u = u_new;
-                u_new = tmp;
-            }
+            // swap pointers ON DEVICE
+            double*** tmp = u;
+            u = u_new;
+            u_new = tmp;
         }
     }
-
     return iter_max;
 }
 
@@ -160,37 +158,48 @@ int jacobi_ref_norm(double ***u, double ***u_new, double ***f, int N, int iter_m
 }
 
 int jacobi_offload_norm(double*** u, double*** u_new, double*** f, int N, int iter_max, double* tolerance) {
-    
     double delta2 = (2.0 / (N - 1)) * (2.0 / (N - 1));
-    int it = 0;
 
     double d = INFINITY;
+    int iter = 0;
 
-    #pragma omp target data map(to: u[0:N][0:N][0:N], f[0:N][0:N][0:N]) map(alloc: u_new[0:N][0:N][0:N]) map(tofrom: d)
-    while (d > *tolerance && it < iter_max) {
-        d = 0.0;
-        #pragma omp target teams distribute parallel for collapse(2) reduction(max:d)
+    #pragma omp target data \
+        map(to: u[0:N][0:N][0:N], f[0:N][0:N][0:N]) \
+        map(alloc: u_new[0:N][0:N][0:N])
+    {
+        for (int it = 0; it < iter_max; ++it) {
+            d = 0.0;
 
-        for (int i = 1; i < N-1; i++)
-            for (int j = 1; j < N-1; j++)
-                for (int k = 1; k < N-1; k++) {
-                    
-                    double new_val = (1.0/6.0) * (
-                        u[i-1][j][k] + u[i+1][j][k] +
-                        u[i][j-1][k] + u[i][j+1][k] +
-                        u[i][j][k-1] + u[i][j][k+1] +
-                        delta2 * f[i][j][k]);
+            //#pragma omp parallel for collapse(2)
+            #pragma omp target teams distribute parallel for collapse(3)  is_device_ptr(u, u_new, f) reduction(max:d)
+            for (int i = 1; i < N-1; i++)
+                for (int j = 1; j < N-1; j++)
+                    for (int k = 1; k < N-1; k++) {
 
-                    double diff = fabs(new_val - u[i][j][k]);
-                    d = fmax(d, diff);
-                    
-                    u_new[i][j][k] = new_val;
-                }
+                        double val = (1.0 / 6.0) * (
+                            u[i-1][j][k] + u[i+1][j][k] +
+                            u[i][j-1][k] + u[i][j+1][k] +
+                            u[i][j][k-1] + u[i][j][k+1] +
+                            delta2 * f[i][j][k]
+                        );
 
-        double*** tmp = u; u = u_new; u_new = tmp;
-        it++;
+                        double diff = fabs(val - u[i][j][k]);
+                        d = fmax(d, diff);
+
+                        u_new[i][j][k] = val;
+                    }
+            printf("d = %f\n", d);
+            if (d < *tolerance) break;
+
+            double ***tmp = u;
+            u = u_new;
+            u_new = tmp;
+
+            iter++;
+            printf("iteration %d, d = %f\n", iter, d);
+        }
     }
-    return it;
+    return iter;
 }
 
 int jacobi_offload3(double*** u, double*** u_new, double*** f, int N, int iter_max, double* tolerance) {
@@ -258,7 +267,7 @@ int jacobi_offload3(double*** u, double*** u_new, double*** f, int N, int iter_m
                 }
             }
         }
-        #pragma taskwait
+        #pragma omp taskwait
         double* tmp = d_a; d_a = d_a_new; d_a_new = tmp;
         it++;
     }
