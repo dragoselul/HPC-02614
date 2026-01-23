@@ -217,64 +217,84 @@ int jacobi_offload3(double*** u, double*** u_new, double*** f, int N, int iter_m
     cudaSetDevice(1);
     cudaDeviceEnablePeerAccess(0, 0); // (dev 0, future flag)
     cudaSetDevice(0);
-
-    double* d_a;
-    double*** d_u = d_malloc_3d(N, N, N, &d_a);
-    omp_target_memcpy(d_a, u[0][0], N*N*N*sizeof(double), 0, 0, dev0, omp_get_initial_device());
-
-    double* d_a_new;
-    double*** d_u_new = d_malloc_3d(N, N, N, &d_a_new);
-    omp_target_memcpy(d_a_new, u_new[0][0], N*N*N*sizeof(double), 0, 0, dev0, omp_get_initial_device());
-
-    double* d_a_f;
-    double*** d_f = d_malloc_3d(N, N, N, &d_a_f);
-    omp_target_memcpy(d_a_f, f[0][0], N*N*N*sizeof(double), 0, 0, dev0, omp_get_initial_device());
     
+    double* d_a0;
+    double*** d_u0 = d_malloc_3d(N, N, N_half, &d_a0);
+    omp_target_memcpy(d_a0, u[0][0], N*N*N_half*sizeof(double), 0, 0, dev0, omp_get_initial_device());
+
+    double* d_a1;
+    double*** d_u1 = d_malloc_3d(N, N, N_half, &d_a1, dev1);
+    omp_target_memcpy(d_a1, u[0][0] + (N*N*N_half), N*N*N_half*sizeof(double), 0, 0, dev1, omp_get_initial_device());
+
+    double* d_a_new0;
+    double*** d_u_new0 = d_malloc_3d(N, N, N_half, &d_a_new0);
+    omp_target_memcpy(d_a_new0, u_new[0][0], N*N*N_half*sizeof(double), 0, 0, dev0, omp_get_initial_device());
+
+    double* d_a_new1;
+    double*** d_u_new1 = d_malloc_3d(N, N, N_half, &d_a_new1, dev1);
+    omp_target_memcpy(d_a_new1, u_new[0][0] + (N*N*N_half), N*N*N_half*sizeof(double), 0, 0, dev1, omp_get_initial_device());
+
+    double* d_a_f0;
+    double*** d_f0 = d_malloc_3d(N, N, N_half, &d_a_f0);
+    omp_target_memcpy(d_a_f0, f[0][0], N*N*N_half*sizeof(double), 0, 0, dev0, omp_get_initial_device());
+
+    double* d_a_f1;
+    double*** d_f1 = d_malloc_3d(N, N, N_half, &d_a_f1, dev1);
+    omp_target_memcpy(d_a_f1, f[0][0] + (N*N*N_half), N*N*N_half*sizeof(double), 0, 0, dev1, omp_get_initial_device());
+
     while (it < iter_max) 
     {
         // --- GPU 0: first half ---
-        #pragma omp target teams distribute parallel for collapse(3) device(dev0) is_device_ptr(d_a, d_a_new, d_a_f) nowait
+        #pragma omp target teams distribute parallel for collapse(3) device(dev0) is_device_ptr(d_a0, d_a_new0, d_a_f0) nowait
         for (int i = 1; i < N_half; i++) {
             for (int j = 1; j < N-1; j++) {
                 for (int k = 1; k < N-1; k++) {
                     int idx = (i*N + j)*N + k;
                     
                     double val = (1.0/6.0) * (
-                        d_a[idx-N*N] + d_a[idx+N*N] +
-                        d_a[idx-N] + d_a[idx+N] +
-                        d_a[idx-1] + d_a[idx+1] +
-                        delta2 * d_a_f[idx]);
+                        d_a0[idx-N*N] + d_a0[idx+N*N] +
+                        d_a0[idx-N] + d_a0[idx+N] +
+                        d_a0[idx-1] + d_a0[idx+1] +
+                        delta2 * d_a_f0[idx]);
                     
-                    d_a_new[idx] = val;
+                    d_a_new0[idx] = val;
                 }
             }
         }
         
         // --- GPU 1: second half ---
-        #pragma omp target teams distribute parallel for collapse(3) device(dev1) is_device_ptr(d_a, d_a_new, d_a_f) nowait
-        for (int i = N_half; i < N-1; i++) {
+        #pragma omp target teams distribute parallel for collapse(3) device(dev1) is_device_ptr(d_a1, d_a_new1, d_a_f1) nowait
+        for (int i = 1; i < N_half; i++) {
             for (int j = 1; j < N-1; j++) {
                 for (int k = 1; k < N-1; k++) {
                     int idx = (i*N + j)*N + k;
 
                     double val = (1.0/6.0) * (
-                        d_a[idx-N*N] + d_a[idx+N*N] +
-                        d_a[idx-N] + d_a[idx+N] +
-                        d_a[idx-1] + d_a[idx+1] +
-                        delta2 * d_a_f[idx]);
+                        d_a1[idx-N*N] + d_a1[idx+N*N] +
+                        d_a1[idx-N] + d_a1[idx+N] +
+                        d_a1[idx-1] + d_a1[idx+1] +
+                        delta2 * d_a_f1[idx]);
                     
-                    d_a_new[idx] = val;
+                    d_a_new1[idx] = val;
                 }
             }
         }
         #pragma omp taskwait
-        double* tmp = d_a; d_a = d_a_new; d_a_new = tmp;
+        //double* tmp = d_a; d_a = d_a_new; d_a_new = tmp;
+        double* tmp0 = d_a0; d_a0 = d_a_new0; d_a_new0 = tmp0;
+        double* tmp1 = d_a1; d_a1 = d_a_new1; d_a_new1 = tmp1;
         it++;
     }
-    omp_target_memcpy(u[0][0], d_a, N*N*N*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
-    d_free_3d(d_u, d_a);
-    d_free_3d(d_u_new, d_a_new);
-    d_free_3d(d_f, d_a_f);
+    //omp_target_memcpy(u[0][0], d_a, N*N*N*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
+    omp_target_memcpy(u[0][0], d_a0, N*N*N_half*sizeof(double), 0, 0, dev0, omp_get_initial_device());
+    omp_target_memcpy(u[0][0] + (N*N*N_half), d_a1, N*N*N_half*sizeof(double), 0, 0, dev1, omp_get_initial_device());
+
+    d_free_3d(d_u0, d_a0, dev0);
+    d_free_3d(d_u1, d_a1, dev1);
+    d_free_3d(d_u_new0, d_a_new0, dev0);
+    d_free_3d(d_u_new1, d_a_new1, dev1);
+    d_free_3d(d_f0, d_a_f0, dev0);
+    d_free_3d(d_f1, d_a_f1, dev1);
 
     return it;
 }
